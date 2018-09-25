@@ -1,0 +1,21 @@
+{
+    "name": "cavo789/php_helpers",
+    "description": "Some helpers to develop faster in PHP 7",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christophe Avonture",
+            "email": "christophe@avonture.be"
+        }
+    ],	
+    "homepage": "https://github.com/cavo789/php_helpers",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0.0"
+    },
+	"autoload": {
+        "psr-4": {
+            "cavo789\\": "src/cavo789/"
+        }
+    }
+}
