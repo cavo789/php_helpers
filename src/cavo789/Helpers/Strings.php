@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
+namespace cavo789\Helpers;
 
 class Strings
 {

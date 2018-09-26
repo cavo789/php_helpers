@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
+namespace cavo789\Helpers;
 
 class HTML
 {
@@ -61,7 +61,11 @@ class HTML
 				$extra['rel'] .= ' noopener ';
 			}
 			if (strpos($rel, 'noreferrer') === false) {
-				$extra['rel'] .= ' noreferrer';
+				$extra['rel'] .= 'noreferrer ';
+			}
+
+			if (isset($extra['rel'])) {
+				$extra['rel'] = trim($extra['rel']);
 			}
 		}
 
@@ -70,7 +74,7 @@ class HTML
 		$flattened = $extra;
 
 		array_walk($flattened, function (&$value, $key) {
-			$value = $key . ' ="' . $value . '" ';
+			$value = $key . '="' . $value . '" ';
 		});
 
 		// Make the link
@@ -87,7 +91,7 @@ class HTML
 	 */
 	public static function getCurrentURL() : string
 	{
-		return 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+		return 'http://' . ($_SERVER['HTTP_HOST'] ?? '') . $_SERVER['PHP_SELF'];
 	}
 
 	/**
@@ -218,7 +222,10 @@ class HTML
 	 * 	startsWith('Laravel', 'Lara') ==> true
 	 *
 	 * @link https://stackoverflow.com/a/834355/1065340
-
+	 *
+	 * This function is also in the cavo789\Helpers\Strings
+	 * helper; in double here just for avoiding to add a dependency.
+	 *
 	 * @param  string  $string The string
 	 * @param  string  $prefix The prefix to search
 	 * @return boolean True when the string is ending with that prefix
@@ -259,7 +266,7 @@ class HTML
 		$script = trim($script);
 
 		if (!self::startsWith($script, '<script')) {
-			$script = '<script src="' . $script . '"></script>';
+			$script = '<script type="text/javascript" src="' . $script . '"></script>';
 		}
 
 		return $script;
@@ -285,8 +292,8 @@ class HTML
 	 * Parse the HTML string and remove comments
 	 *
 	 * Example :
-	 * 	$html = '<!-- a comment --><h1>Test</h1><!-- something else -->'
-	 * 	$result = removeHTMLComments($html)  ' return <h1>Test</h1>
+	 * 	$html = '<!-- a comment --><h1>Test</h1><!-- something else -->';
+	 * 	$result = removeHTMLComments($html);  ' return <h1>Test</h1>
 	 *
 	 * @param  string $html
 	 * @return string The HTML string without comments

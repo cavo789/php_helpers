@@ -5,13 +5,21 @@
  * Written date : 2018-09-13
  * Last modified:
  *
- * Generic helper functions
+ * Generic helper functions.
+ *
+ * cavo789\Helpers\App aimed to provide features for
+ * working with the application like enabling or not a debug mode
+ *
  * Reusable in other projects
  */
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
-namespace cavo789;
+namespace cavo789\Helpers;
+
+defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+
+use cavo789\Helpers\Files as Files;
 
 class App
 {
@@ -38,7 +46,7 @@ class App
 		$path = rtrim($folder, DS) . DS;
 
 		if (!file_exists($path)) {
-			self::makeFolder($path, true);
+			Files::makeFolder($path, true);
 		}
 
 		ini_set('error_log', $path . 'error.log');
