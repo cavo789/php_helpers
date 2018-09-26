@@ -77,7 +77,7 @@ class Template
 	 * @param  string $name For instance "index"
 	 * @return string
 	 */
-	public function getTemplate(string $name) : string
+	private function getTemplate(string $name) : string
 	{
 		$name = Files::sanitize(trim($name));
 
@@ -167,34 +167,24 @@ class Template
 		$url = HTML::getCurrentURL(true);
 		$html = str_replace('{{ url }}', $url, $html);
 
-		/*	$id = Settings::getSurveyID() ?? '';
-			if ($id == 0) {
-				$id = '';
-			}
-			$html = str_replace('{{ survey_id }}', $id, $html);
-			*/
-
 		$app = App::getInstance();
 		$html = str_replace('{{ debug }}', $app->getDebugMode() ? 1 : 0, $html);
 
 		/**
-		 * The HTML template can contains tags like
+		 * The HTML template can contains user tags like
 		 * 	{{ download_html }}
 		 * 	{{ download_pdf }}
 		 *		{{ new_window_html }}
+		 *		{{ my_own_tag }}
 		 *
-		 * Get the list of key-value pair in the $exarrVariablestra array and if one
+		 * Get the list of key-value pair in the $arrVariables array and if one
 		 * key is mentioned in the file replace the tag by its value
 		 */
 		foreach ($arrVariables as $key => $value) {
 			if (strpos($html, '{{ ' . $key . ' }}') !== false) {
-				$html = str_replace('{{ ' . $key . ' }}', trim($value), $html);
+				$html = str_replace('{{ ' . $key . ' }}', $value, $html);
 			}
 		}
-
-		// First get the content of the page before getting assets
-		/*$html = str_replace('{{ css }}', Settings::getCSS(), $html);
-		$html = str_replace('{{ js }}', Settings::getJS(), $html);*/
 
 		return $html;
 	}
