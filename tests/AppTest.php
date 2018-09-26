@@ -26,7 +26,11 @@ $folder = __DIR__ . '/logs';
 echo Utilities::out('Initialize the debug mode, create folder [' . $folder . '] ' .
 	'and create the application.log file');
 
-$app = new App(true, ['folder' => $folder]);
+$app = new App(true, [
+	'folder' => $folder,
+	'trace_deep' => 1,
+	'root' => dirname(__DIR__)
+]);
 
 // Raise a notice, display it and record it
 echo Utilities::out('Use of an undefined variable should raise a Notice, ' .
@@ -53,7 +57,7 @@ echo Utilities::out(PHP_EOL . PHP_EOL . 'Output in the application log');
 
 // DebugMode = true => the application.log file will contains all levels below
 $app->setDebugMode(true);
-$app->debug('This is a debug message');
+$app->debug('This is a debug message', ['username' => 'Christophe']);
 $app->info('This is a information');
 $app->notice('This is a notice');
 $app->warning('This is a warning');
