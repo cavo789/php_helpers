@@ -11,12 +11,28 @@ class ComposerStaticInitbb1166566f9c82c05c815b4ce067057f
         array (
             'cavo789\\' => 8,
         ),
+        'P' => 
+        array (
+            'Psr\\Log\\' => 8,
+        ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'cavo789\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/cavo789',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
     );
 

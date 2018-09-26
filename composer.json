@@ -22,7 +22,8 @@
   },
   "minimum-stability": "dev",
   "require": {
-    "php": ">=7.0.0"
+    "php": ">=7.0.0",
+    "monolog/monolog": "^2.0@dev"
   },
   "autoload": {
     "psr-4": {

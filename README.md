@@ -6,12 +6,12 @@
 
 - [Install](#install)
 - [Classes](#classes)
+  \_ [App](#app)
   \_ [Error](#error)
 - [Helpers](#helpers)
-  _ [App](#app)
   _ [ArrayHelper](#arrayhelper)
   _ [Files](#files)
-  _ [HTML](#html)
+  \_ [HTML](#html)
   \_ [Strings](#strings)
 - [License](#license)
 
@@ -22,6 +22,8 @@
 ## Classes
 
 List of classes
+
+### App
 
 ### Error
 
@@ -41,13 +43,11 @@ $error = new Error("<h1>Houston we' ve a problem</h1>" . PHP_EOL .
 throw new \RuntimeException('Action not supported');
 ```
 
-Note: you can also use a template file like `$error = new Error("templates/error.html");`
+Note: you can also use a template file `$error = new Error("templates/error.html");`
 
 ## Helpers
 
 List of helpers
-
-### App
 
 ### ArrayHelper
 
