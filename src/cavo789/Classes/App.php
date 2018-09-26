@@ -5,24 +5,23 @@
  * Written date : 2018-09-13
  * Last modified:
  *
- * Generic helper functions.
- *
- * cavo789\Helpers\App aimed to provide features for
+ * cavo789\Class\App aimed to provide features for
  * working with the application like enabling or not a debug mode
  *
  * This class implements the LoggerInterface and, thus, expose the methods
  * for writing an information into a log file (thanks to Monolog).
  *
+ * Because this class can be instantiated in more than one script
+ * of the same application, the class is a Singleton: only one instance
+ * will be instantiated and loaded into memory.
+ *
  * How to:
  * 		use \cavo789\Classes\App as App;
- * 		$app = new App(true, ['folder' => __DIR__.'/logs']);
- * 		$app->setDebugMode(true);
+ * 		$app = App::getInstance(true, ['folder' => __DIR__.'/logs']);
  * 		$app->debug('This is a debug message');
  * 		$app->info('This is a information');
  *
  * Require monolog/monolog
- *
- * Reusable in other projects
  */
 
 declare(strict_types=1);
@@ -61,7 +60,7 @@ define('DEBUG_TRACE_DEEP', -1);
 
 // Remove the previous file ? True means that the log file
 // will be removed on each start of the calling php script
-define('DEBUG_DELETE_PREVIOUS', true);
+define('DEBUG_DELETE_PREVIOUS', false);
 
 class App implements LoggerInterface
 {
@@ -87,8 +86,16 @@ class App implements LoggerInterface
 	private $log_handler = null;
 
 	private $trace_deep = 0;
+	/**
+	 * @var Singleton
+	 * @access private
+	 * @static
+	 */
+	private static $_instance = null;
 
 	/**
+	 * Private function: please use App::getInstance() instead
+	 *
 	 * Depending on the $debug parameter, enable / disable the
 	 * PHP error mode i.e. show extra infos (enable) or don't
 	 * show at all (disable)
@@ -109,7 +116,7 @@ class App implements LoggerInterface
 	 *                      'trace_deep' = How many callers should be taken in each log entry? (default: DEBUG_TRACE_DEEP)
 	 * @return void
 	 */
-	public function __construct(
+	private function __construct(
 		bool $debugMode = false,
 		array $extra = []
 	) {
@@ -146,7 +153,7 @@ class App implements LoggerInterface
 				try {
 					unlink($log);
 				} catch (Exception $e) {
-					throw new Exception('The file ' . $log . ' can\'t be removed');
+					throw new Exception(sprintf('The file %s can\'t be removed', $log));
 				}
 			}
 		}
@@ -170,6 +177,27 @@ class App implements LoggerInterface
 	}
 
 	/**
+	 * This class should be loaded only once so if called
+	 * in several PHP scripts, we need to avoid to load the
+	 * class again and again. For this, use getInstance() to
+	 * load a Singleton and return the $_instance pointer as
+	 * from the second class
+	 *
+	 * @param void
+	 * @return Singleton
+	 */
+	public static function getInstance(
+		bool $debugMode = false,
+		array $extra = []
+	) {
+		if (is_null(self::$_instance)) {
+			self::$_instance = new App($debugMode, $extra);
+		}
+
+		return self::$_instance;
+	}
+
+	/**
 	 * Set the debugging mode
 	 *
 	 * @param  boolean $onOff
@@ -181,8 +209,7 @@ class App implements LoggerInterface
 
 		// add records to the log
 		self::info(
-			'Debug mode is ' .
-			($this->debugMode
+			'Debug mode is ' . ($this->debugMode
 				? 'ON, output all levels'
 				: 'OFF, output only Error, Critical, Alert and Emergency')
 		);
@@ -206,6 +233,15 @@ class App implements LoggerInterface
 	}
 
 	/**
+	 * Return true / false depending on the state of the debug mode flag
+	 *
+	 * @return boolean
+	 */
+	public function getDebugMode() : bool {
+		return $this->debugMode;
+	}
+
+	/**
 	 * Output in the application log information's about the context
 	 * of the current script
 	 *
@@ -213,7 +249,20 @@ class App implements LoggerInterface
 	 */
 	private function logContext()
 	{
-		self::info($_SERVER['QUERY_STRING'] ?? 'Query string empty');
+		// Record the used path_info; used when calling an API like
+		// "index.php/stats/surveys_count"
+		if (isset($_SERVER['PATH_INFO'])) {
+			if (trim($_SERVER['PATH_INFO']) !== '') {
+				self::info('PATH_INFO: ' . $_SERVER['PATH_INFO']);
+			}
+		}
+
+		// And get the query string if there is one
+		if (isset($_SERVER['QUERY_STRING'])) {
+			if (trim($_SERVER['QUERY_STRING']) !== '') {
+				self::info('QUERY_STRING: ' . $_SERVER['QUERY_STRING']);
+			}
+		}
 	}
 
 	/**

@@ -89,9 +89,67 @@ class HTML
 	 *
 	 * @return string
 	 */
-	public static function getCurrentURL() : string
-	{
-		return 'http://' . ($_SERVER['HTTP_HOST'] ?? '') . $_SERVER['PHP_SELF'];
+	public static function getCurrentURL(
+		bool $removeScriptName = true,
+		bool $removeQueryString = true,
+		bool $removePathInfo = true
+	) : string {
+		// Determine if it's http or https
+		if (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == '1')) {
+			$scheme = 'https';
+		} else {
+			$scheme = 'http';
+		}
+
+		// Get the port isn't 80 (http) or 443 (https)
+		$port = '';
+		// $_SERVER['SERVER_PORT'] is not present when started from a CLI script
+		if (isset($_SERVER['SERVER_PORT'])) {
+			if (!in_array($_SERVER['SERVER_PORT'], [80, 443])) {
+				$port = ":$_SERVER[SERVER_PORT]";
+			}
+		}
+
+		// Get the domain name (127.0.0.1 or localhost or a domain)
+		// $_SERVER['SERVER_NAME'] is not present when started from a CLI script
+		$serverName = '';
+		if (isset($_SERVER['SERVER_PORT'])) {
+			$serverName = $_SERVER['SERVER_NAME'];
+		}
+
+		// Get the URL (what appears after the server_name)
+		$URI = '';
+		if (isset($_SERVER['REQUEST_URI'])) {
+			$URI = $_SERVER['REQUEST_URI'];
+		}
+
+		$pageURL = $scheme . '://' . $serverName . $port . $URI;
+
+		// Do we need to remove the name of the script. If true, don't
+		// return http://localhost/site/index.php but
+		// http://localhost/site/
+		if ($removeScriptName) {
+			$script = basename($_SERVER['SCRIPT_NAME']);
+			$pageURL = str_replace('/' . $script, '', $pageURL);
+			$pageURL = rtrim($pageURL, '/') . '/';
+		}
+
+		if (($removeScriptName) && (isset($_SERVER['REQUEST_URI']))) {
+			$URI = $_SERVER['REQUEST_URI'];
+			$pageURL = str_replace('?' . $_SERVER['QUERY_STRING'], '', $pageURL);
+			$pageURL = rtrim($pageURL, '/') . '/';
+		}
+
+		// PATH_INFO is a suffix added to the script like in
+		//		...index.php/download/xxxx
+		// as used in API calls
+		if ($removePathInfo) {
+			if (isset($_SERVER['PATH_INFO'])) {
+				$pageURL = str_replace($_SERVER['PATH_INFO'], '', $pageURL);
+			}
+		}
+
+		return $pageURL;
 	}
 
 	/**
@@ -115,7 +173,7 @@ class HTML
 		if ($addCurrentURL) {
 			$url = self::getCurrentURL();
 
-			return  $url . '?' . $queryString;
+			return $url . '?' . $queryString;
 		} else {
 			return $queryString;
 		}

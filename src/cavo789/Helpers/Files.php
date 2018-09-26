@@ -26,7 +26,7 @@ class Files
 	public static function makeFolder(string $path, bool $deny = true)
 	{
 		$path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		
+
 		// If not yet present, create the folder
 		if (!file_exists($path)) {
 			mkdir($path, 0755, true);
@@ -55,12 +55,13 @@ class Files
 	/**
 	 * Sanitize a file/folder name; remove dangerous characters
 	 * Allow / and \ to allow to identify a subfolder
+	 * Allow : since used under Windows
 	 *
 	 * @param  string $name
 	 * @return string
 	 */
 	public static function sanitize(string $name) : string
 	{
-		return preg_replace('/[^a-zA-Z0-9\-\.\/\\_]/', '', $name);
+		return preg_replace('/[^a-zA-Z0-9\-\_\.\/\:\\\]/', '', $name);
 	}
 }
