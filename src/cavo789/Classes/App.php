@@ -24,7 +24,7 @@
  * Require monolog/monolog
  */
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace cavo789\Classes;
 
@@ -319,7 +319,7 @@ class App implements LoggerInterface
 	 */
 	public function debug($message, array $context = [])
 	{
-		self::log(LOGGER::DEBUG, (string) $message, $context);
+		self::log(LOGGER::DEBUG, (string)$message, $context);
 	}
 
 	/**
@@ -332,7 +332,7 @@ class App implements LoggerInterface
 	 */
 	public function info($message, array $context = [])
 	{
-		self::log(LOGGER::INFO, (string) $message, $context);
+		self::log(LOGGER::INFO, (string)$message, $context);
 	}
 
 	/**
@@ -345,7 +345,7 @@ class App implements LoggerInterface
 	 */
 	public function notice($message, array $context = [])
 	{
-		self::log(LOGGER::NOTICE, (string) $message, $context);
+		self::log(LOGGER::NOTICE, (string)$message, $context);
 	}
 
 	/**
@@ -358,7 +358,7 @@ class App implements LoggerInterface
 	 */
 	public function warning($message, array $context = [])
 	{
-		self::log(LOGGER::WARNING, (string) $message, $context);
+		self::log(LOGGER::WARNING, (string)$message, $context);
 	}
 
 	/**
@@ -371,7 +371,7 @@ class App implements LoggerInterface
 	 */
 	public function error($message, array $context = [])
 	{
-		self::log(LOGGER::ERROR, (string) $message, $context);
+		self::log(LOGGER::ERROR, (string)$message, $context);
 	}
 
 	/**
@@ -384,7 +384,7 @@ class App implements LoggerInterface
 	 */
 	public function critical($message, array $context = [])
 	{
-		self::log(LOGGER::CRITICAL, (string) $message, $context);
+		self::log(LOGGER::CRITICAL, (string)$message, $context);
 	}
 
 	/**
@@ -397,7 +397,7 @@ class App implements LoggerInterface
 	 */
 	public function alert($message, array $context = [])
 	{
-		self::log(LOGGER::ALERT, (string) $message, $context);
+		self::log(LOGGER::ALERT, (string)$message, $context);
 	}
 
 	/**
@@ -410,6 +410,6 @@ class App implements LoggerInterface
 	 */
 	public function emergency($message, array $context = [])
 	{
-		self::log(LOGGER::EMERGENCY, (string) $message, $context);
+		self::log(LOGGER::EMERGENCY, (string)$message, $context);
 	}
 }

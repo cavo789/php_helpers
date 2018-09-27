@@ -169,10 +169,9 @@ class Error
 	 *
 	 * @return boolean
 	 */
-	private function is_ajax(): bool
+	private function is_ajax() : bool
 	{
-		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-			(strtolower(getenv('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest');
+		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower(getenv('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest');
 	}
 
 	/**
@@ -225,7 +224,7 @@ class Error
 	 * @param  integer $errline
 	 * @return void
 	 */
-	public function scriptError(int $errno, string $errstr, string  $errfile, int $errline)
+	public function scriptError(int $errno, string $errstr, string $errfile, int $errline)
 	{
 		if (!headers_sent()) {
 			header('HTTP/1.1 ' . $this->http_returned_errorcode . ' ' .

@@ -9,7 +9,7 @@
  * Reusable in other projects
  */
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace cavo789\Helpers;
 
@@ -351,8 +351,9 @@ class HTML
 	 *
 	 * @param string $sCSV  A comma separated content	 *
 	 * @param array  $extra Optional
-	 *                      - "id"			ID to use for the table
-	 *                      - "class"		CLASS to add in the table tag
+	 *                      - "id"					ID to use for the table
+	 *                      - "class"				CLASS to add in the table tag
+	 *                      - "class_enhanced"	CLASS to add only when enhanced=1
 	 *                      - "enhanced"	Just a simple raw table
 	 *                      or with extra features like tfoot, classes, ...?
 	 *                      - "anything else" (f.i. "style", "grid", "role", ...)
@@ -378,16 +379,26 @@ class HTML
 		// Get extra infos if present and don't allow the presence of
 		// double-quotes in the value to not broke our HTML tag
 		$tblID = str_replace('"', '', trim($extra['id'] ?? ''));
-		$tblClass = str_replace('"', '', trim($extra['class'] ?? ''));
-
 		if ($tblID !== '') {
 			$tblID = ' id="' . $tblID . '"';
 			unset($extra['id']);
 		}
 
+		$tblClassEnhanced = '';
+		if ($enhanced) {
+			$tblClassEnhanced = str_replace('"', '', trim($extra['class_enhanced'] ?? ''));
+			if ($tblClassEnhanced !== '') {
+				unset($extra['class_enhanced']);
+			}
+		}
+
+		$tblClass = str_replace('"', '', trim($extra['class'] ?? ''));
 		if ($tblClass !== '') {
-			$tblClass = ' class="' . $tblClass . '"';
 			unset($extra['class']);
+		}
+
+		if (($tblClass !== '') || ($tblClassEnhanced !== '')) {
+			$tblClass = ' class="' . trim($tblClass . ' ' . $tblClassEnhanced) . '"';
 		}
 
 		// The $extra array contains perhaps other entries like, f.i.,
@@ -426,8 +437,7 @@ class HTML
 		}
 
 		// Add tfoot only for enhanced table
-		$table .= '<thead><tr>' . $line . '</tr></thead>' .
-			($enhanced ? '<tfoot><tr>' . $line . '</tr></tfoot>' : '') .
+		$table .= '<thead><tr>' . $line . '</tr></thead>' . ($enhanced ? '<tfoot><tr>' . $line . '</tr></tfoot>' : '') .
 			'<tbody>';
 
 		// Remove the first entry in the array so remove the heading rows
@@ -461,12 +471,11 @@ class HTML
 		$table =
 			'<table' .
 			$tblID .
-			// No class, no attributes when the output is a "stupid" table
-			// i.e. when $extra['enhanced] wasn't set to 1
-			($enhanced ? $tblClass . $attributes : '') .
+			$tblClass .
+			$attributes .
 			'>' .
 			$table .  // The table content
-			'</table>';
+		'</table>';
 
 		return $table;
 	}
