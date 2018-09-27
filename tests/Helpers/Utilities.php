@@ -9,23 +9,35 @@ namespace tests\Helpers;
 
 class Utilities
 {
-	public static function out(string $str, bool $isTitle = false)
-	{
+	public static function out(
+		string $sMessage,
+		bool $isTitle = false,
+		bool $bReturn = false
+	) : string {
+		$sReturn = '';
 		if ($isTitle) {
 			// For readability, add a few empty lines
 			for ($i = 0; $i < 5; $i++) {
-				echo "\r\n";
+				$sReturn .= "\r\n";
 			}
 
-			$str = '= ' . $str . ' =';
+			$sMessage = '= ' . $sMessage . ' =';
 
-			echo str_repeat('=', strlen($str)) . PHP_EOL;
+			$sReturn .= str_repeat('=', strlen($sMessage)) . PHP_EOL;
 		}
 
-		echo $str . PHP_EOL;
+		$sReturn .= $sMessage . PHP_EOL;
 
 		if ($isTitle) {
-			echo  str_repeat('=', strlen($str)) . PHP_EOL . PHP_EOL;
+			$sReturn .= str_repeat('=', strlen($sMessage)) . PHP_EOL . PHP_EOL;
+		}
+
+		if (!$bReturn) {
+			echo $sReturn;
+
+			return '';
+		} else {
+			return $sReturn;
 		}
 	}
 }

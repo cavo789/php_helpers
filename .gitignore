@@ -1,4 +1,4 @@
-.vscode/
+.vscode/*
 tests/testFolder/*
 tests/logs/*
 tests/Templates/*

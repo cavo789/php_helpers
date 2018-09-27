@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace cavo789\Helpers;
 
+use cavo789\Helpers\Strings as Strings;
+
 class HTML
 {
 	/**
@@ -275,27 +277,6 @@ class HTML
 	}
 
 	/**
-	 * Confirm or not if a string is starts with ...
-	 *
-	 * 	startsWith('Laravel', 'Lara') ==> true
-	 *
-	 * @link https://stackoverflow.com/a/834355/1065340
-	 *
-	 * This function is also in the cavo789\Helpers\Strings
-	 * helper; in double here just for avoiding to add a dependency.
-	 *
-	 * @param  string  $string The string
-	 * @param  string  $prefix The prefix to search
-	 * @return boolean True when the string is ending with that prefix
-	 */
-	private static function startsWith(string $string, string $prefix) : bool
-	{
-		$length = strlen($prefix);
-
-		return boolval(substr($string, 0, $length) === $prefix);
-	}
-
-	/**
 	 * Check if the $style also contains the <link> tag, if not,
 	 * add the tag
 	 *
@@ -305,7 +286,7 @@ class HTML
 	public static function addCSSTag(string $style) : string
 	{
 		$style = trim($style);
-		if (!self::startsWith($style, '<link')) {
+		if (!Strings::startsWith($style, '<link')) {
 			$style = '<link rel="stylesheet" href="' . $style . '" media="screen"/>';
 		}
 
@@ -323,7 +304,7 @@ class HTML
 	{
 		$script = trim($script);
 
-		if (!self::startsWith($script, '<script')) {
+		if (!Strings::startsWith($script, '<script')) {
 			$script = '<script type="text/javascript" src="' . $script . '"></script>';
 		}
 
