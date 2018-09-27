@@ -86,6 +86,7 @@ class App implements LoggerInterface
 	private $log_handler = null;
 
 	private $trace_deep = 0;
+
 	/**
 	 * @var Singleton
 	 * @access private
@@ -237,7 +238,8 @@ class App implements LoggerInterface
 	 *
 	 * @return boolean
 	 */
-	public function getDebugMode() : bool {
+	public function getDebugMode() : bool
+	{
 		return $this->debugMode;
 	}
 

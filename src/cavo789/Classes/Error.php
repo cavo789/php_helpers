@@ -12,26 +12,30 @@
  * Just include this classe at the very top of your script and every runtime
  * errors will be captured and displayed through this file.
  *
+ * Because this class can be instantiated in more than one script
+ * of the same application, the class is a Singleton: only one instance
+ * will be instantiated and loaded into memory.
+ *
  * Use it
  *
  * require_once('Error.php');
- * $error = new \Classes\Error();
+ * $error = Error::getInstance();
  *
  * or
  *
  * // Setting the HTML to display
- *	$error = new \Classes\Error('<h1>Houston we've a problem</h1>');
+ *	$error = Error::getInstance('<h1>Houston we've a problem</h1>');
  *
  * or
  *
  * // HTML template using the tag so the error will be inserted there
- * $error = new \Classes\Error("<h1>Houston we' ve a problem </h1>".
+ * $error = Error::getInstance("<h1>Houston we' ve a problem </h1>".
  * 	"<div>{{ error_message }}</div><div>Please email us</div>");
  *
  * or
  *
  * // The HTML template is a filename not inline HTML
- * $error = new \Classes\Error(__DIR__ . '/templates/error.html')
+ * $error = Error::getInstance(__DIR__ . '/templates/error.html')
  *
  * See the other parameters for more customization
  *
@@ -58,6 +62,13 @@ class Error
 	private $defaultTemplate = '<pre style="background-color:orange;padding:25px;">%s</pre>';
 
 	/**
+	 * @var Singleton
+	 * @access private
+	 * @static
+	 */
+	private static $_instance = null;
+
+	/**
 	 * Initialize the class
 	 *
 	 * @param string $template    HTML string or full name of the file to use as template
@@ -71,7 +82,7 @@ class Error
 	 * @param string $tag_title   When using a template, the error code will be inserted
 	 *                            when the mentioned title is found (default is {{ error_title }})
 	 */
-	public function __construct(
+	private function __construct(
 		string $template = '',
 		string $timezone = 'Europe/Brussels',
 		string $dateFormat = 'd M Y H:i:s',
@@ -114,6 +125,43 @@ class Error
 
 		// And remove it when the script is being finished
 		register_shutdown_function([$this, 'shutdown']);
+	}
+
+	/**
+	 * Load an instance of the class
+	 *
+	 * @param string $template    HTML string or full name of the file to use as template
+	 *                            for displaying errors
+	 * @param string $timezone    Timezone like Europe/Paris
+	 * @param string $dateFormat  How to display date/time (f.i. D M Y H:i:s)
+	 * @param string $tag_message When using a template, text to search for replacing it
+	 *                            by the error message (default is {{ error_message }})
+	 * @param string $tag_code    When using a template, the error code will be inserted
+	 *                            when the mentioned tag is found (default is {{ error_code }})
+	 * @param string $tag_title   When using a template, the error code will be inserted
+	 *
+	 * @return Singleton
+	 */
+	public static function getInstance(
+		string $template = '',
+		string $timezone = 'Europe/Brussels',
+		string $dateFormat = 'd M Y H:i:s',
+		string $tag_message = '{{ error_message }}',
+		string $tag_code = '{{ error_code }}',
+		string $tag_title = '{{ error_title }}'
+	) {
+		if (is_null(self::$_instance)) {
+			self::$_instance = new Error(
+				$template,
+				$timezone,
+				$dateFormat,
+				$tag_message,
+				$tag_code,
+				$tag_title
+			);
+		}
+
+		return self::$_instance;
 	}
 
 	/**

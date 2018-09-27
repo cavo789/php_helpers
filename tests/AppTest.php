@@ -26,7 +26,7 @@ $folder = __DIR__ . '/logs';
 echo Utilities::out('Initialize the debug mode, create folder [' . $folder . '] ' .
 	'and create the application.log file');
 
-$app = new App(true, [
+$app = App::getInstance(true, [
 	'folder' => $folder,
 	'trace_deep' => 1,
 	'root' => dirname(__DIR__)

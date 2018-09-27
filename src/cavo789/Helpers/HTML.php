@@ -345,4 +345,129 @@ class HTML
 
 		return preg_replace($pattern, '', $html);
 	}
+
+	/**
+	 * Convert as CSV string into a HTML table
+	 *
+	 * @param string $sCSV  A comma separated content	 *
+	 * @param array  $extra Optional
+	 *                      - "id"			ID to use for the table
+	 *                      - "class"		CLASS to add in the table tag
+	 *                      - "enhanced"	Just a simple raw table
+	 *                      or with extra features like tfoot, classes, ...?
+	 *                      - "anything else" (f.i. "style", "grid", "role", ...)
+	 *
+	 * @return string
+	 */
+	public static function csv2table(
+		string $sCSV,
+		array $extra = []
+	) : string {
+		// If the CSV is empty, nothing to do
+		if (trim($sCSV) == '') {
+			return '';
+		}
+
+		// Just a simple raw table (very basic) or with extra
+		// features like with classes, tfoot, ...?
+		$enhanced = boolval($extra['enhanced'] ?? false);
+		if (isset($extra['enhanced'])) {
+			unset($extra['enhanced']);
+		}
+
+		// Get extra infos if present and don't allow the presence of
+		// double-quotes in the value to not broke our HTML tag
+		$tblID = str_replace('"', '', trim($extra['id'] ?? ''));
+		$tblClass = str_replace('"', '', trim($extra['class'] ?? ''));
+
+		if ($tblID !== '') {
+			$tblID = ' id="' . $tblID . '"';
+			unset($extra['id']);
+		}
+
+		if ($tblClass !== '') {
+			$tblClass = ' class="' . $tblClass . '"';
+			unset($extra['class']);
+		}
+
+		// The $extra array contains perhaps other entries like, f.i.,
+		//		"style"=>"display:none", "role"=>"grid", ...
+		// Get all remaining entries and generate an "attributes" string
+		$attributes = '';
+		if ($enhanced) {
+			// Only with an enhanced table; not needed for a "stupid" raw table
+			if (count($extra) > 0) {
+				foreach ($extra as $key => $value) {
+					$attributes .= $key . '="' . str_replace('"', '', $value) . '" ';
+				}
+				$attributes = ' ' . trim($attributes);
+			}
+		}
+
+		// Cleansing
+		$sCSV = str_replace('&quot;', '"', $sCSV);
+
+		// Parse the rows
+		$rows = str_getcsv($sCSV, "\n");
+
+		// Our <table>
+		$table = '';
+
+		// Output the list of fields name
+		$line = '';
+
+		// Get the headings from the first line
+		$header = str_getcsv(trim($rows[0], '"'), ';', '"');
+
+		// $header is an associative array. $key is a number and
+		// $field the name of the field
+		foreach ($header as $key => $field) {
+			$line .= '<th>' . trim($field, '"') . '</th>';
+		}
+
+		// Add tfoot only for enhanced table
+		$table .= '<thead><tr>' . $line . '</tr></thead>' .
+			($enhanced ? '<tfoot><tr>' . $line . '</tr></tfoot>' : '') .
+			'<tbody>';
+
+		// Remove the first entry in the array so remove the heading rows
+		// (since already processed)
+		array_shift($rows);
+
+		// Process each lines i.e. all the records (=> answers)
+		foreach ($rows as $row) {
+			// Don't process empty rows
+			if (trim($row) == '') {
+				continue;
+			}
+
+			// Convert value;value;value into an array
+			$row = str_getcsv($row, ';');
+
+			$line = '';
+			foreach ($row as $key => $value) {
+				// Can't be "null", should be a string
+				$value = is_null($value) ? '' : $value;
+
+				// Make a few cleaning
+				$line .= '<td>' . Strings::cleansing($value) . '</td>';
+			}
+			$table .= '<tr>' . $line . '</tr>';
+		}
+
+		$table .= '</tbody>';
+
+		// Add the table tag.
+		$table =
+			'<table' .
+			$tblID .
+			// No class, no attributes when the output is a "stupid" table
+			// i.e. when $extra['enhanced] wasn't set to 1
+			($enhanced ? $tblClass . $attributes : '') .
+			'>' .
+			$table .  // The table content
+			'</table>';
+
+		return $table;
+	}
 }

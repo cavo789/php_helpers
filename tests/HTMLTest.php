@@ -30,3 +30,23 @@ echo Utilities::out('* isAjaxRequest ? ==> ' . (HTML::isAjaxRequest() ? 'Yes' : 
 
 $html = '<!-- a comment --><h1>Test</h1><!-- something else -->';
 echo Utilities::out('* removeHTMLComments [' . $html . '] ==> ' . HTML::removeHTMLComments($html));
+
+$csv = "col1;col2;col3\nrow1-1;row1-2;row1-3;\nrow2-1;row2-2;row2-3";
+echo Utilities::out(PHP_EOL . '* csv2table; simple');
+echo Utilities::out(HTML::csv2table($csv));
+
+echo Utilities::out(PHP_EOL . '* csv2table; enhanced');
+echo Utilities::out(HTML::csv2table($csv, ['enhanced' => true]));
+
+echo Utilities::out(PHP_EOL . '* csv2table; enhanced, ID, class, style');
+echo Utilities::out(HTML::csv2table(
+	$csv,
+	[
+		'enhanced' => true,
+		'id' => 'tblTest',
+		'class' => 'table table-hover table-bordered table-striped dataTable',
+		'style' => 'background-color:red;font-size:3em;',
+		'role' => 'grid',
+		'data-attr' => 'MyAwesomeAttribute'
+	]
+));

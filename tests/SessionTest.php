@@ -16,7 +16,7 @@ use \tests\Helpers\Utilities as Utilities;
 /**
  * Run the tests
  */
-$session = new Session('MyApp_');
+$session = Session::getInstance('MyApp_');
 
 echo Utilities::out('Check cavo789\Classes\Session', true);
 
@@ -46,6 +46,19 @@ echo Utilities::out(PHP_EOL . 'Retrieve an array from the session');
 echo Utilities::out(print_r($session->get('User'), true));
 
 echo Utilities::out('Session isExpired?: ' . ($session->isExpired() ? 'YES' : 'NO'));
+
+echo Utilities::out(PHP_EOL . '* Using flash message *' . PHP_EOL);
+echo Utilities::out('Store the "Invalid password" as a flash message (destroyed on the first get)');
+
+$session->flash('message', 'Invalid password');
+
+echo Utilities::out('Retrieve the message (should display Invalid password)');
+echo Utilities::out("\tFlash message: " . $session->getFlash('message', '#NOTFOUND
+'));
+
+echo Utilities::out('Once more ... (should display #NOTFOUND)');
+echo Utilities::out("\tFlash message: " . $session->getFlash('message', '#NOTFOUND
+'));
 
 // Kill the session
 $session->destroy();

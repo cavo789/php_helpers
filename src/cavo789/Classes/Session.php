@@ -8,9 +8,13 @@
  * cavo789\Class\Session aimed to provide features for
  * working with the $_SESSION object
  *
+ * Because this class can be instantiated in more than one script
+ * of the same application, the class is a Singleton: only one instance
+ * will be instantiated and loaded into memory.
+ *
  * How to:
  * 		use \cavo789\Classes\Session as Session;
- * 		$session = new Session('MyApp_');
+ * 		$session = Session::getInstance('MyApp_');
  * 		$session->set('Password', md5('MyPassword'));
  *
  * 		echo '<pre>'.print_r($session->getAll(), true).'</pre>';
@@ -32,6 +36,16 @@ class Session
 {
 	private $key_prefix = '';
 
+	// Default duration for a session (15 minutes)
+	private $duration = 15;
+
+	/**
+	 * @var Singleton
+	 * @access private
+	 * @static
+	 */
+	private static $_instance = null;
+
 	/**
 	 * Constructor
 	 *
@@ -41,12 +55,37 @@ class Session
 	 *                           Specify f.i. "MySuperSoft_" to have all your keys
 	 *                           prefixed with that pattern.
 	 */
-	public function __construct(string $key_prefix = '')
+	private function __construct(string $key_prefix = '')
 	{
-		if (!isset($_SESSION)) {
-			session_start();
-		}
 		$this->key_prefix = trim($key_prefix) ?? '';
+	}
+
+	/**
+	 * Load an instance of the class
+	 *
+	 * @param string $key_prefix Keys added by this class
+	 *                           can have a prefix to make sure that there will
+	 *                           be no conflict with other running script.
+	 *                           Specify f.i. "MySuperSoft_" to have all your keys
+	 *                           prefixed with that pattern.
+	 *
+	 * @return Singleton
+	 */
+	public static function getInstance(string $key_prefix = '')
+	{
+		if (is_null(self::$_instance)) {
+			self::$_instance = new Session($key_prefix);
+		}
+
+		if (!isset($_SESSION)) {
+			if (!session_start()) {
+				throw new \Exception('The session can\'t be started');
+			} else {
+				$_SESSION[$key_prefix . 'session_id'] = session_id();
+			}
+		}
+
+		return self::$_instance;
 	}
 
 	/**
@@ -54,8 +93,12 @@ class Session
 	 */
 	public function destroy()
 	{
-		session_destroy();
-		$_SESSION = [];
+		if (isset($_SESSION)) {
+			if (session_id()) {
+				session_destroy();
+			}
+			$_SESSION = [];
+		}
 	}
 
 	/**
@@ -64,21 +107,43 @@ class Session
 	 * @param integer $time Expressed in minutes, the length of time
 	 *                      during which the session will be considered valid
 	 */
-	public function register(int $time = 60)
+	public function register(int $duration = 15)
 	{
-		$_SESSION[self::getKey('session_id')] = session_id();
-		$_SESSION[self::getKey('session_time')] = intval($time);
-		$_SESSION[self::getKey('session_start')] = self::newTime();
+		$this->duration = $duration;
+		self::set('session_validUntil', self::validUntil());
 	}
 
 	/**
-	 * Checks if the session has been registered
+	 * Checks if the session has been registered. When the session
+	 * has expired, this function will return False too.
 	 *
 	 * @return boolean True if it is, False if not.
 	 */
 	public function isRegistered() : bool
 	{
-		if (!empty($_SESSION[self::getKey('session_id')])) {
+		if (self::isExpired()) {
+			return false;
+		} else {
+			if (trim(self::get('session_id', '')) !== '') {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * Checks to see if the session is still valid (expired?).
+	 *
+	 * @return boolean
+	 */
+	public function isExpired()
+	{
+		if (self::get('session_validUntil') < time()) {
+			// When the session is expired, destory the session
+			// to remove any sensitive information's
+			//self::destroy();
+
 			return true;
 		} else {
 			return false;
@@ -109,6 +174,39 @@ class Session
 	}
 
 	/**
+	 * Store a flash message into the Session. On the first call,
+	 * the message will be removed.
+	 *
+	 * @param  string $key
+	 * @param  string $value
+	 * @return void
+	 */
+	public function flash(string $key, string $value)
+	{
+		self::set('flash.' . $key, $value);
+	}
+
+	/**
+	 * Get a flash message. Once obtained, the message will be removed
+	 * from the Session variables
+	 *
+	 * @param  string $key
+	 * @param  string $default
+	 * @return string
+	 */
+	public function getFlash(string $key, string $default = '') : string
+	{
+		$value = $default;
+
+		if (isset($_SESSION[self::getKey('flash.' . $key)])) {
+			$value = self::get('flash.' . $key, $default);
+			self::remove('flash.' . $key);
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Retrieve the global session variable.
 	 *
 	 * @return array
@@ -122,11 +220,27 @@ class Session
 		foreach ($_SESSION as $key => $value) {
 			if (Strings::startsWith($key, $this->key_prefix)) {
 				$key = substr($key, strlen($this->key_prefix));
+
+				// Returns only our object; the ones starting with
+				// our prefix
+				$arr[$key] = $value;
 			}
-			$arr[$key] = $value;
 		}
 
 		return $arr;
+	}
+
+	/**
+	 * Remove a key from the Session collection
+	 *
+	 * @param  string $key Key to remove
+	 * @return void
+	 */
+	public function remove(string $key)
+	{
+		if (isset($_SESSION[self::getKey($key)])) {
+			unset($_SESSION[self::getKey($key)]);
+		}
 	}
 
 	/**
@@ -136,29 +250,15 @@ class Session
 	 */
 	public function getSessionId() : string
 	{
-		return $_SESSION[self::getKey('session_id')];
-	}
-
-	/**
-	 * Checks to see if the session is still valid (expired?).
-	 *
-	 * @return boolean
-	 */
-	public function isExpired()
-	{
-		if ($_SESSION[self::getKey('session_start')] < $this->timeNow()) {
-			return true;
-		} else {
-			return false;
-		}
+		return self::get('session_id');
 	}
 
 	/**
 	 * Extends the current session
 	 */
-	public function renew()
+	public function extends()
 	{
-		$_SESSION[self::getKey('session_start')] = self::newTime();
+		self::set('session_validUntil', self::validUntil());
 	}
 
 	/**
@@ -173,36 +273,14 @@ class Session
 	}
 
 	/**
-	 * Returns the current time.
+	 * Calculate the end validity time of the session
+	 * (i.e. probably now() + 15 minutes which is the
+	 * default duration for a session (see $this->duration))
 	 *
 	 * @return int timestamp
 	 */
-	private function timeNow() : int
+	private function validUntil() : int
 	{
-		return mktime(
-			intval(date('H')),	// Hour
-			intval(date('i')),	// Minutes
-			intval(date('s')),	// Seconds
-			intval(date('m')),	// Month
-			intval(date('d')),	// Day
-			intval(date('y'))	// Year
-		);
-	}
-
-	/**
-	 * Generates new time.
-	 *
-	 * @return int timestamp
-	 */
-	private function newTime() : int
-	{
-		return mktime(
-			intval(date('H')),	// Hour
-			(intval(date('i')) + $_SESSION[self::getKey('session_time')]), // Minutes
-			intval(date('s')),	// Seconds
-			intval(date('m')),	// Month
-			intval(date('d')),	// Day
-			intval(date('y'))	// Year
-		);
+		return time() + ($this->duration * 60);
 	}
 }
