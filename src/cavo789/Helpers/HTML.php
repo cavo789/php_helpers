@@ -9,7 +9,7 @@
  * Reusable in other projects
  */
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace cavo789\Helpers;
 
@@ -93,7 +93,6 @@ class HTML
 	 */
 	public static function getCurrentURL(
 		bool $removeScriptName = true,
-		bool $removeQueryString = true,
 		bool $removePathInfo = true
 	) : string {
 		// Determine if it's http or https
@@ -136,8 +135,7 @@ class HTML
 			$pageURL = rtrim($pageURL, '/') . '/';
 		}
 
-		if (($removeScriptName) && (isset($_SERVER['REQUEST_URI']))) {
-			$URI = $_SERVER['REQUEST_URI'];
+		if (($removeScriptName) && (isset($_SERVER['QUERY_STRING']))) {
 			$pageURL = str_replace('?' . $_SERVER['QUERY_STRING'], '', $pageURL);
 			$pageURL = rtrim($pageURL, '/') . '/';
 		}
@@ -188,14 +186,14 @@ class HTML
 	 * @param  string  $default A default value (f.i. "showIndex")
 	 * @param  string  $filter
 	 * @param  integer $source
-	 * @return void    (can be a string or a int or ...)
+	 * @return string
 	 */
 	public static function getParameter(
 		string $name,
 		$default = '',
 		string $filter = 'string',
 		int $source = INPUT_GET
-	) {
+	) : string {
 		// List of filters @https://www.w3schools.com/php/php_ref_filter.asp
 		switch ($filter) {
 			case 'bool':
@@ -218,7 +216,7 @@ class HTML
 			$value = trim($value);
 		}
 
-		return $value;
+		return strval($value);
 	}
 
 	/**
@@ -227,16 +225,16 @@ class HTML
 	 * @param  string $name
 	 * @param  string $default
 	 * @param  string $filter
-	 * @return void
+	 * @return string
 	 */
 	public static function getFormVariable(
 		string $name,
 		$default = '',
 		string $filter = 'string'
-	) {
+	) : string {
 		$value = self::getParameter($name, $default, $filter, INPUT_POST);
 
-		return self::getParameter($name, $default, $filter, INPUT_POST);
+		return $value;
 	}
 
 	/**
@@ -348,6 +346,8 @@ class HTML
 
 	/**
 	 * Convert as CSV string into a HTML table
+	 *
+	 * @suppress PhanUnusedVariable
 	 *
 	 * @param string $sCSV  A comma separated content	 *
 	 * @param array  $extra Optional

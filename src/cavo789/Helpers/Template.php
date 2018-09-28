@@ -14,9 +14,9 @@ namespace cavo789\Helpers;
 
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
-use cavo789\Classes\App as App;
-use cavo789\Helpers\Files as Files;
-use cavo789\Helpers\HTML as HTML;
+use \cavo789\Classes\App as App;
+use \cavo789\Helpers\Files as Files;
+use \cavo789\Helpers\HTML as HTML;
 
 class Template
 {
@@ -281,7 +281,7 @@ class Template
 		$html = str_replace('{{ url }}', $url, $html);
 
 		$app = App::getInstance();
-		$html = str_replace('{{ debug }}', $app->getDebugMode() ? 1 : 0, $html);
+		$html = str_replace('{{ debug }}', strval($app->getDebugMode() ? 1 : 0), $html);
 
 		/**
 		 * The HTML template can contains user tags like

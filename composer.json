@@ -29,5 +29,8 @@
     "psr-4": {
       "cavo789\\": "src/cavo789/"
     }
+  },
+  "require-dev": {
+    "phan/phan": "dev-master"
   }
 }

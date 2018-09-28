@@ -40,7 +40,7 @@ class Session
 	private $duration = 15;
 
 	/**
-	 * @var Singleton
+	 * @var Session
 	 * @access private
 	 * @static
 	 */
@@ -69,7 +69,7 @@ class Session
 	 *                           Specify f.i. "MySuperSoft_" to have all your keys
 	 *                           prefixed with that pattern.
 	 *
-	 * @return Singleton
+	 * @return Session
 	 */
 	public static function getInstance(string $key_prefix = '')
 	{
@@ -104,8 +104,8 @@ class Session
 	/**
 	 * Register the session.
 	 *
-	 * @param integer $time Expressed in minutes, the length of time
-	 *                      during which the session will be considered valid
+	 * @param integer $duration Expressed in minutes, the length of time
+	 *                          during which the session will be considered valid
 	 */
 	public function register(int $duration = 15)
 	{
@@ -124,7 +124,7 @@ class Session
 		if (self::isExpired()) {
 			return false;
 		} else {
-			if (trim(self::get('session_id', '')) !== '') {
+			if (trim(strval(self::get('session_id', ''))) !== '') {
 				return true;
 			} else {
 				return false;
@@ -199,7 +199,7 @@ class Session
 		$value = $default;
 
 		if (isset($_SESSION[self::getKey('flash.' . $key)])) {
-			$value = self::get('flash.' . $key, $default);
+			$value = strval(self::get('flash.' . $key, $default));
 			self::remove('flash.' . $key);
 		}
 
@@ -246,11 +246,11 @@ class Session
 	/**
 	 * Gets the id for the current session.
 	 *
-	 * @return string - session id (not an integer!)
+	 * @return string - session id (not an integer since also contains letters)
 	 */
 	public function getSessionId() : string
 	{
-		return self::get('session_id');
+		return strval(self::get('session_id'));
 	}
 
 	/**

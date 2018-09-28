@@ -62,7 +62,7 @@ class Error
 	private $defaultTemplate = '<pre style="background-color:orange;padding:25px;">%s</pre>';
 
 	/**
-	 * @var Singleton
+	 * @var Error
 	 * @access private
 	 * @static
 	 */
@@ -140,7 +140,7 @@ class Error
 	 *                            when the mentioned tag is found (default is {{ error_code }})
 	 * @param string $tag_title   When using a template, the error code will be inserted
 	 *
-	 * @return Singleton
+	 * @return Error
 	 */
 	public static function getInstance(
 		string $template = '',
@@ -217,6 +217,8 @@ class Error
 
 	/**
 	 * An error has been encountered, display it
+	 *
+	 * @suppress PhanUnusedVariableCaughtException
 	 *
 	 * @param  integer $errno
 	 * @param  string  $errstr
@@ -302,7 +304,7 @@ class Error
 			if (file_exists($this->template)) {
 				try {
 					$html = file_get_contents($this->template);
-				} catch (Exception $e) {
+				} catch (\Exception $e) {
 					$html = $this->tag_message;
 				}
 			} else {
@@ -316,7 +318,7 @@ class Error
 			$html .= trim($error);
 		}
 
-		$html = str_replace($this->tag_code, $this->http_returned_errorcode, $html);
+		$html = str_replace($this->tag_code, strval($this->http_returned_errorcode), $html);
 		$html = str_replace($this->tag_title, $this->http_returned_errortitle, $html);
 
 		/**
@@ -348,7 +350,6 @@ class Error
 
 	public function shutdown()
 	{
-		$isError = false;
 		if ($error = error_get_last()) {
 			switch ($error['type']) {
 				case E_ERROR:
@@ -358,7 +359,6 @@ class Error
 				case E_RECOVERABLE_ERROR:
 				case E_CORE_WARNING:
 				case E_COMPILE_WARNING:
-					$isError = true;
 					$this->scriptError($error['type'], $error['message'], $error['file'], $error['line']);
 					break;
 			}

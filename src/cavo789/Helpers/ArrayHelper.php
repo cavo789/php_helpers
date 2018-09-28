@@ -19,7 +19,7 @@ class ArrayHelper
 	 * Simple function that will convert array with items into a string
 	 *
 	 * @param  array  $arr
-	 * @param  array  $function User function that will be called for each item
+	 * @param  string $function User function that will be called for each item
 	 * @return string
 	 */
 	public static function array2string(array $arr, string $function = '') : string
@@ -41,13 +41,13 @@ class ArrayHelper
 	 * Determine if the given key exists in the provided array.
 	 * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
 	 *
-	 * @param  [type] $array
-	 * @param  [type] $key
-	 * @return void
+	 * @param  array   $array
+	 * @param  string  $key
+	 * @return boolean
 	 */
-	private static function exists($array, $key)
+	private static function exists(array $array, string $key) : bool
 	{
-		if ($array instanceof ArrayAccess) {
+		if ($array instanceof \ArrayAccess) {
 			return $array->offsetExists($key);
 		}
 
@@ -61,18 +61,18 @@ class ArrayHelper
 	 * @param  mixed $value
 	 * @return bool
 	 */
-	private static function accessible($value)
+	private static function accessible($value) : bool
 	{
-		return is_array($value) || $value instanceof ArrayAccess;
+		return is_array($value) || $value instanceof \ArrayAccess;
 	}
 
 	/**
 	 * Get an item from an array using "dot" notation.
 	 * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
 	 *
-	 * @param  \ArrayAccess|array $array
-	 * @param  string             $key
-	 * @param  mixed              $default
+	 * @param  array  $array
+	 * @param  string $key
+	 * @param  mixed  $default
 	 * @return mixed
 	 */
 	public static function array_get(array $array, string $key, $default = null)
@@ -160,9 +160,9 @@ class ArrayHelper
 	 * @link https://stackoverflow.com/questions/797251/transposing-multidimensional-arrays-in-php/797268#797268
 
 	 * @param  array $arr
-	 * @return void
+	 * @return array
 	 */
-	public static function transpose(array $arr)
+	public static function transpose(array $arr) : array
 	{
 		$out = [];
 		foreach ($arr as $key => $subarr) {
