@@ -89,11 +89,24 @@ class HTML
 	/**
 	 * Return the current URL
 	 *
+	 * @param  boolean $removeScriptName Remove the script from the URL
+	 *                                   return http://localhost/BOSA/ and not
+	 *                                   http://localhost/BOSA/index.php when True
+	 *                                   i.e. remove "index.php"
+	 * @param  boolean $removePathInfo   Remove the path after the script name
+	 *                                   return http://localhost/BOSA/ and not
+	 *                                   http://localhost/BOSA/index.php/API/clear
+	 *                                   when True i.e. remove "/API/clear"
+	 *                                   Works also when URLs are rewritten like
+	 *                                   http://localhost/BOSA/API/clear,
+	 *                                   http://localhost/BOSA/ will be returned
+	 * @param  boolean $root
 	 * @return string
 	 */
 	public static function getCurrentURL(
 		bool $removeScriptName = true,
-		bool $removePathInfo = true
+		bool $removePathInfo = true,
+		bool $root = true
 	) : string {
 		// Determine if it's http or https
 		if (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == '1')) {
@@ -122,6 +135,15 @@ class HTML
 		$URI = '';
 		if (isset($_SERVER['REQUEST_URI'])) {
 			$URI = $_SERVER['REQUEST_URI'];
+
+			// When using rewritten URLs we can have
+			// http://localhost/LimeSurvey/BOSA/api/clear
+			// when the real page is http://localhost/LimeSurvey/BOSA/index.php
+			// Removing PathInfo should remove "/api/clear" since this is, also,
+			// a parameter
+			if ($removePathInfo) {
+				$URI = dirname($_SERVER['SCRIPT_NAME']);
+			}
 		}
 
 		$pageURL = $scheme . '://' . $serverName . $port . $URI;
@@ -140,10 +162,10 @@ class HTML
 			$pageURL = rtrim($pageURL, '/') . '/';
 		}
 
-		// PATH_INFO is a suffix added to the script like in
-		//		...index.php/download/xxxx
-		// as used in API calls
 		if ($removePathInfo) {
+			// PATH_INFO is a suffix added to the script like in
+			//		...index.php/download/xxxx
+			// as used in API calls
 			if (isset($_SERVER['PATH_INFO'])) {
 				$pageURL = str_replace($_SERVER['PATH_INFO'], '', $pageURL);
 			}

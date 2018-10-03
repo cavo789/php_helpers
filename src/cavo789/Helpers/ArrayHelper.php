@@ -38,6 +38,48 @@ class ArrayHelper
 	}
 
 	/**
+	 * Convert an associative array (for instance the result of a
+	 * SQL SELECT STATEMENT) into a CSV string.
+	 *
+	 * @param  array  $arr       The array with the records
+	 * @param  string $delimiter The delimiter to use (default is ";")
+	 * @return string The CSV string
+	 */
+	public static function array2csv(array $arr, string $delimiter = ';') : string
+	{
+		$sCSV = '';
+
+		// Emtpy ? Nothing to do
+		if (count($arr) == 0) {
+			return $sCSV;
+		}
+
+		// No spaces f.i. before or after
+		$delimiter = trim($delimiter);
+
+		// Can't be empty
+		if ($delimiter == '') {
+			$delimiter = ';';
+		}
+
+		// Get the field name
+		foreach ($arr[0] as $key => $value) {
+			$sCSV .= $key . $delimiter;
+		}
+		$sCSV = trim($sCSV, $delimiter) . PHP_EOL;
+
+		// Now process the array and export all rows into a CSV row
+		for ($i = 0; $i < count($arr); $i++) {
+			foreach ($arr[$i] as $key => $value) {
+				$sCSV .= $value . $delimiter;
+			}
+			$sCSV = trim($sCSV, $delimiter) . PHP_EOL;
+		}
+
+		return trim($sCSV, PHP_EOL);
+	}
+
+	/**
 	 * Determine if the given key exists in the provided array.
 	 * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
 	 *
