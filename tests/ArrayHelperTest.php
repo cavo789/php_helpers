@@ -1,74 +1,100 @@
 <?php
 
-namespace cavo789;
+declare(strict_types=1);
 
-/**
- * Run this script from the command prompt :
- *		php ArrayHelperTest.php
- */
+namespace cavo789;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__ . '/Helpers/Utilities.php';
 
+use \PHPUnit\Framework\TestCase;
 use \cavo789\Helpers\ArrayHelper as ArrayHelper;
-use \tests\Helpers\Utilities as Utilities;
 
-/**
- * Run the tests
- */
+define('FOLDER', __DIR__ . '/logs');
+define('LOGFILE', FOLDER . '/application.log');
 
-echo Utilities::out('Check cavo789\Helpers\ArrayHelper', true);
+final class ArrayHelperTest extends TestCase
+{
+	/**
+	 * Test array2string function
+	 *
+	 * @return void
+	 */
+	public function testarray2string() : void
+	{
+		$arr = ['style.css', 'interface.css', 'demo.css'];
+		$result = ArrayHelper::array2string($arr);
 
-// ------------------------
-// 1. Test array2string
-echo Utilities::out('* array2string *');
-$arr = ['style.css', 'interface.css', 'demo.css'];
-echo Utilities::out('Convert an array into a string, one item = one line');
-echo Utilities::out('Sample array: [' . implode($arr, ', ') . ']');
-echo Utilities::out(PHP_EOL . '   Without processing; just output ' .
-	'items:' . PHP_EOL);
-echo ArrayHelper::array2string($arr);
+		// Just each item on a new line
+		$expected = 'style.css' . PHP_EOL . 'interface.css' . PHP_EOL . 'demo.css';
 
-echo Utilities::out(PHP_EOL . '   Call a function (like ' .
-	'cavo789\Helpers\HTML::addCSSTag()) on each item:' . PHP_EOL);
+		$this->assertTrue($expected == $result);
 
-echo ArrayHelper::array2string($arr, 'cavo789\Helpers\HTML::addCSSTag');
+		// addCSSTag will add the stylesheet tag if not already mentionned
+		// 	<link rel="stylesheet" href="xxxx" media="screen"/>
+		$result = ArrayHelper::array2string($arr, 'cavo789\Helpers\HTML::addCSSTag');
 
-// ------------------------
-// 2. Test array_get
-echo Utilities::out(PHP_EOL . '* array_get *');
+		$expected =
+			'<link rel="stylesheet" href="style.css" media="screen"/>' . PHP_EOL .
+			'<link rel="stylesheet" href="interface.css" media="screen"/>' . PHP_EOL .
+			'<link rel="stylesheet" href="demo.css" media="screen"/>';
 
-// Create an associative array
-$json = '{ "cdn" : { "css" : [ "style.css", "interface.css", "demo.css" ] } }';
-$arr = json_decode($json, true);
-
-echo Utilities::out('Content of the $arr table:');
-echo print_r($arr, true);
-
-echo Utilities::out(PHP_EOL . 'Use dot notation to retrieve a key; get "cdn.css"');
-
-echo print_r(ArrayHelper::array_get($arr, 'cdn.css'), true);
-
-// ------------------------
-// 2. Test transpose
-echo Utilities::out(PHP_EOL . '* transpose *');
-
-$json = '';
-for ($user = 1; $user <= 3; $user++) {
-	$json .= '"User' . $user . '":{ ';
-	for ($question = 1; $question <= 3; $question++) {
-		$json .= '"Question' . $question . '": "Answer User' . $user .
-			' - Q' . $question . '",';
+		$this->assertTrue($expected == $result);
 	}
-	$json = rtrim($json, ',') . '},';
+
+	/**
+	 * Test array_get function
+	 *
+	 * @return void
+	 */
+	public function testarray_get() : void
+	{
+		// Create an associative array
+		$json = '{ "cdn" : { "enabled" : "1", "css" : [ "style.css", "interface.css", "demo.css" ] } }';
+		$arr = json_decode($json, true);
+
+		// Use dot notation to retrieve a key; get "cdn.enabled"
+		// Retrieve a boolean
+		$value = boolval(ArrayHelper::array_get($arr, 'cdn.enabled'));
+		$this->assertTrue($value);
+
+		// Retrieve an array
+		$arr = ArrayHelper::array_get($arr, 'cdn.css');
+		$expected = ['style.css', 'interface.css', 'demo.css'];
+		$this->assertTrue($arr == $expected);
+	}
+
+	/**
+	 * Test transpose function
+	 *
+	 * @return void
+	 */
+	public function testtranspose() : void
+	{
+		// Define a two dimensional array
+		$arr = [];
+		$arr['User1']['Question1'] = 'Answer User1 - Q1';
+		$arr['User2']['Question1'] = 'Answer User2 - Q1';
+		$arr['User3']['Question1'] = 'Answer User3 - Q1';
+		$arr['User1']['Question2'] = 'Answer User1 - Q2';
+		$arr['User2']['Question2'] = 'Answer User2 - Q2';
+		$arr['User3']['Question2'] = 'Answer User3 - Q2';
+		$arr['User1']['Question3'] = 'Answer User1 - Q3';
+		$arr['User2']['Question3'] = 'Answer User2 - Q3';
+		$arr['User3']['Question3'] = 'Answer User3 - Q3';
+
+		// Expected: the same table but transposed
+		$expected = [];
+		$expected['Question1']['User1'] = 'Answer User1 - Q1';
+		$expected['Question1']['User2'] = 'Answer User2 - Q1';
+		$expected['Question1']['User3'] = 'Answer User3 - Q1';
+		$expected['Question2']['User1'] = 'Answer User1 - Q2';
+		$expected['Question2']['User2'] = 'Answer User2 - Q2';
+		$expected['Question2']['User3'] = 'Answer User3 - Q2';
+		$expected['Question3']['User1'] = 'Answer User1 - Q3';
+		$expected['Question3']['User2'] = 'Answer User2 - Q3';
+		$expected['Question3']['User3'] = 'Answer User3 - Q3';
+
+		$this->assertTrue($expected == ArrayHelper::transpose($arr));
+	}
 }
-$json = '{ ' . rtrim($json, ',') . '}';
-$arr = json_decode($json, true);
-
-echo Utilities::out(PHP_EOL . 'Content of the $arr table before (Users->Questions->Answers):');
-echo print_r($arr, true);
-
-echo Utilities::out(PHP_EOL . 'Content of the $arr table after ' .
-	'the transpose (Questions->Users->Answers):');
-
-echo print_r(ArrayHelper::transpose($arr), true);

@@ -28,7 +28,7 @@ class Template
 	private $arrSupportedMode = ['html', 'raw'];
 
 	/**
-	 * Undocumented function
+	 * Constructor
 	 *
 	 * @throws \InvalidArgumentException When the folder name if mentioned and doesn't exists on disk
 	 *
@@ -54,7 +54,7 @@ class Template
 	}
 
 	/**
-	 * Undocumented function
+	 * Define the mode (f.i. "html" or "raw")
 	 *
 	 * @throws \InvalidArgumentException When the mode isn't supported
 	 *
@@ -307,6 +307,6 @@ class Template
 			}
 		}
 
-		return $html;
+		return trim($html, " \n");
 	}
 }

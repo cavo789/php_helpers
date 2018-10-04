@@ -34,7 +34,7 @@ class ArrayHelper
 			$return .= $value . PHP_EOL;
 		}
 
-		return $return;
+		return rtrim($return, PHP_EOL);
 	}
 
 	/**

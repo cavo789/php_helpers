@@ -1,79 +1,267 @@
 <?php
 
-namespace cavo789;
+declare(strict_types=1);
 
-/**
- * Run this script from the command prompt :
- *		php AppTest.php
- */
+namespace cavo789;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__ . '/Helpers/Utilities.php';
 
 use \cavo789\Classes\App as App;
-use \tests\Helpers\Utilities as Utilities;
+use \PHPUnit\Framework\TestCase;
 
-/**
- * Run the tests
- */
+define('FOLDER', __DIR__ . '/logs');
+define('LOGFILE', FOLDER . '/application.log');
 
-echo Utilities::out('Check cavo789\Classes\App', true);
+final class AppTest extends TestCase
+{
+	public function testDebugModeOn(): void
+	{
+		// Be sure to have everytime a fresh file
+		if (file_exists(LOGFILE)) {
+			unlink(LOGFILE);
+		}
 
-$folder = __DIR__ . '/logs';
+		// Initialize the debug mode, create the log folder
+		// and create the application.log file
 
-// ------------------------
-// 1. Enable the debug mode
-echo Utilities::out('Initialize the debug mode, create folder [' . $folder . '] ' .
-	'and create the application.log file');
+		$app = App::getInstance(true, [
+			'folder' => FOLDER,
+			'trace_deep' => 1,
+			'root' => dirname(__DIR__)
+		]);
 
-$app = App::getInstance(true, [
-	'folder' => $folder,
-	'trace_deep' => 1,
-	'root' => dirname(__DIR__)
-]);
+		// The folder FOLDER should exists
+		$this->assertDirectoryExists(FOLDER);
 
-// Raise a notice, display it and record it
-echo Utilities::out('Use of an undefined variable should raise a Notice, ' .
-	'message displayed here below but also registered in the ' .
-	$folder . '/error.log file' . PHP_EOL);
-echo Utilities::out('* Test is OK when an error is displayed here below *' . PHP_EOL);
-echo $undefined;
+		// The application.log file should exists
+		$this->assertFileExists(LOGFILE);
 
-// -------------------------
-// 2. Disable the debug mode
-echo Utilities::out(PHP_EOL . PHP_EOL . 'Disabling errors');
-$app->setDebugMode(false);
+		// Read the file and check that "Debug mode is ON" is there
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[INFO] Debug mode is ON', $content);
 
-// Still use an undefined variable but don't let the Notice message
-// raise since debug is no more enabled
-echo Utilities::out('Still use an undefined, no notice would be generated here below ' .
-	'and no records added in the log since Notices are no more recorded' . PHP_EOL);
-echo Utilities::out('* Test is OK when no error is displayed here below *' . PHP_EOL);
-echo $undefined;
+		// Mode is ON
+		$this->assertTrue($app->getDebugMode());
+	}
 
-// -------------------------
-// 3. Output in the application log
-echo Utilities::out(PHP_EOL . PHP_EOL . 'Output in the application log');
+	public function testDebugModeOff(): void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(false);
+		$content = file_get_contents(LOGFILE);
 
-// DebugMode = true => the application.log file will contains all levels below
-$app->setDebugMode(true);
-$app->debug('This is a debug message', ['username' => 'Christophe']);
-$app->info('This is a information');
-$app->notice('This is a notice');
-$app->warning('This is a warning');
-$app->error('This is an error; ouch!');
-$app->critical('Something is critic');
-$app->alert('Alert, something is going wrong');
-$app->emergency('Emergency, a meteorit is in approach');
+		$this->assertContains('[INFO] Debug mode is OFF', $content);
 
-// DebugMode = false => the application.log file won't contains levels "below" error
-// so, only Error, Critical, Alert and Emergency
-$app->setDebugMode(false);
-$app->debug('This is a debug message');
-$app->info('This is a information');
-$app->notice('This is a notice');
-$app->warning('This is a warning');
-$app->error('This is an error; ouch!');
-$app->critical('Something is critic');
-$app->alert('Alert, something is going wrong');
-$app->emergency('Emergency, a meteorit is in approach');
+		// Mode is OFF
+		$this->assertTrue(!($app->getDebugMode()));
+	}
+
+	/**
+	 * Test the log() method with different levels
+	 *
+	 * @return void
+	 */
+	public function testLogMsg() : void
+	{
+		$app = App::getInstance();
+
+		$app->setDebugMode(true);
+
+		$app->log('INFO', 'FAKE-LOG-INFO-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[INFO] FAKE-LOG-INFO-INFORMATION-ABOUT-THINGS', $content);
+
+		$app->log('ALERT', 'FAKE-ALERT-INFO-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[ALERT] FAKE-ALERT-INFO-INFORMATION-ABOUT-THINGS', $content);
+
+		$app->log('EMERGENCY', 'FAKE-LOG-EMERGENCY-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[EMERGENCY] FAKE-LOG-EMERGENCY-INFORMATION-ABOUT-THINGS', $content);
+	}
+
+	/**
+	 * Test the debug() method
+	 *
+	 * @return void
+	 */
+	public function testDebugMsg(): void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake debug and check that the line is well mentioned in the file
+		$app->debug('FAKE-DEBUG-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[DEBUG] FAKE-DEBUG-INFORMATION-ABOUT-THINGS', $content);
+
+		// No DEBUG message recorded in the file when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->debug('DEBUG-NOT-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertNotContains('[DEBUG] DEBUG-NOT-RECORDED', $content);
+	}
+
+	/**
+	 * Test the info() method
+	 *
+	 * @return void
+	 */
+	public function testInfoMsg(): void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake info and check that the line is well mentioned in the file
+		$app->info('FAKE-INFO-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[INFO] FAKE-INFO-INFORMATION-ABOUT-THINGS', $content);
+
+		// No INFO message recorded in the file when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->debug('INFO-NOT-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertNotContains('[INFO] INFO-NOT-RECORDED', $content);
+	}
+
+	/**
+	 * Test the notice() method
+	 *
+	 * @return void
+	 */
+	public function testNoticeMsg(): void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake notice and check that the line is well mentioned in the file
+		$app->notice('FAKE-NOTICE-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[NOTICE] FAKE-NOTICE-INFORMATION-ABOUT-THINGS', $content);
+
+		// No Notice message recorded in the file when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->notice('NOTICE-NOT-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertNotContains('[NOTICE] NOTICE-NOT-RECORDED', $content);
+	}
+
+	/**
+	 * Test the warning() method
+	 *
+	 * @return void
+	 */
+	public function testWarningMsg() : void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake warning and check that the line is well mentioned in the file
+		$app->warning('FAKE-WARNING-INFORMATION-ABOUT-THINGS');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[WARNING] FAKE-WARNING-INFORMATION-ABOUT-THINGS', $content);
+
+		// No Warning message recorded in the file when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->notice('WARNING-NOT-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertNotContains('[WARNING] WARNING-NOT-RECORDED', $content);
+	}
+
+	/**
+	 * Test the error() method
+	 *
+	 * @return void
+	 */
+	public function testErrorMsg() : void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(false);
+
+		// Output a fake error and check that the line is well mentioned in the file
+		$app->error('FAKE-ERROR-MESSAGE');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[ERROR] FAKE-ERROR-MESSAGE', $content);
+
+		// Error message well recorded in the file even when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->error('ERROR-WELL-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[ERROR] ERROR-WELL-RECORDED', $content);
+	}
+
+	/**
+	 * Test the critical() method
+	 *
+	 * @return void
+	 */
+	public function testCriticalMsg() : void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake critical and check that the line is well mentioned in the file
+		$app->critical('FAKE-CRITICAL-MESSAGE');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[CRITICAL] FAKE-CRITICAL-MESSAGE', $content);
+
+		// Critical message well recorded in the file even when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->critical('CRITICAL-WELL-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[CRITICAL] CRITICAL-WELL-RECORDED', $content);
+	}
+
+	/**
+	 * Test the alert() method
+	 *
+	 * @return void
+	 */
+	public function testAlertMsg() : void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake alert and check that the line is well mentioned in the file
+		$app->alert('FAKE-ALERT-MESSAGE');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[ALERT] FAKE-ALERT-MESSAGE', $content);
+
+		// Alert message well recorded in the file even when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->alert('ALERT-WELL-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[ALERT] ALERT-WELL-RECORDED', $content);
+	}
+
+	/**
+	 * Test the emergency() method
+	 *
+	 * @return void
+	 */
+	public function testEmergencyMsg() : void
+	{
+		$app = App::getInstance();
+		$app->setDebugMode(true);
+
+		// Output a fake emergency and check that the line is well mentioned in the file
+		$app->emergency('FAKE-EMERGENCY-MESSAGE');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[EMERGENCY] FAKE-EMERGENCY-MESSAGE', $content);
+
+		// Emergency message well recorded in the file even when debug mode is false
+		$app->setDebugMode(false);
+
+		$app->emergency('EMERGENCY-WELL-RECORDED');
+		$content = file_get_contents(LOGFILE);
+		$this->assertContains('[EMERGENCY] EMERGENCY-WELL-RECORDED', $content);
+	}
+}

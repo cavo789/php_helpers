@@ -1,29 +1,34 @@
 <?php
 
-namespace cavo789;
+declare(strict_types=1);
 
-/**
- * Run this script from the command prompt :
- *		php StringsTest.php
- */
+namespace cavo789;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__ . '/Helpers/Utilities.php';
 
 use \cavo789\Helpers\Strings as Strings;
-use \tests\Helpers\Utilities as Utilities;
+use \PHPUnit\Framework\TestCase;
 
-/**
- * Run the tests
- */
+final class StringsTest extends TestCase
+{
+	public function teststartsWithcavo(): void
+	{
+		$this->assertTrue(Strings::startsWith('cavo789', 'cavo'));
+		$this->assertFalse(Strings::startsWith('ca_vo789', 'cavo'));
+		$this->assertFalse(Strings::startsWith('cavo789', 'ca-vo'));
+	}
 
-echo Utilities::out('Check cavo789\Helpers\Strings', true);
+	public function testendsWithcavo(): void
+	{
+		$this->assertTrue(Strings::endsWith('cavo789', '789'));
+		$this->assertFalse(Strings::endsWith('cavo789', 'zzz'));
+	}
 
-$value = 'cavo789';
-echo Utilities::out('* [' . $value . '] startsWith [cavo]? ==> ' . (Strings::startsWith($value, 'cavo') ? 'Yes' : 'No'));
-echo Utilities::out('* [' . $value . '] startsWith [test]? ==> ' . (Strings::startsWith($value, 'test') ? 'Yes' : 'No'));
-echo Utilities::out('* [' . $value . '] endsWith [789]? ==> ' . (Strings::endsWith($value, '789') ? 'Yes' : 'No'));
-echo Utilities::out('* [' . $value . '] endsWith [test]? ==> ' . (Strings::endsWith($value, 'test') ? 'Yes' : 'No'));
-
-$bad = '"test_/?"';
-echo Utilities::out('* cleansing [' . $bad . '] ==> ' . Strings::cleansing($bad));
+	public function testcleansing() : void
+	{
+		// Double quotes are removed
+		$value = '"test_/?"';
+		$this->assertTrue('test_/?' == Strings::cleansing($value));
+	}
+}

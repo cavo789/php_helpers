@@ -9,7 +9,7 @@
  * @link https://www.codepunker.com/blog/handling-php-errors-with-class
  *
  * Description
- * Just include this classe at the very top of your script and every runtime
+ * Just include this class at the very top of your script and every runtime
  * errors will be captured and displayed through this file.
  *
  * Because this class can be instantiated in more than one script

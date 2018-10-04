@@ -1,36 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace cavo789;
-
-/**
- * Run this script from the command prompt :
- *		php TemplateTest.php
- */
-
-defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__ . '/Helpers/Utilities.php';
 
 use \cavo789\Helpers\Template as Template;
-use \tests\Helpers\Utilities as Utilities;
+use \PHPUnit\Framework\TestCase;
 
-/**
- * Run the tests
- */
+final class TemplateTest extends TestCase
+{
+	public function testShowTemplate(): void
+	{
+		// Process the HTML and replace variables and return his HTML
+		$temp = new Template('html', __DIR__ . DIRECTORY_SEPARATOR . 'Templates');
 
-echo Utilities::out('Check cavo789\Helpers\Template', true);
+		$arrVariables = [
+			'title' => 'Test Template',
+			'content' => 'Hello, this is my nice content',
+			'css' => '<link rel="stylesheet" href="style.css" media="screen"/>',
+			'js' => '<script src="js/jquery.js"></script>'
+		];
 
-echo Utilities::out('Read the ' . __DIR__ . DS . 'Templates' . DS . 'login.html, ' .
-	'replace variables and return his HTML');
+		// When using "html" mode, we expect to have CSS and JS
+		$expected =
+			"Test Template\n" .
+			"<link rel=\"stylesheet\" href=\"style.css\" media=\"screen\"/>\n" .
+			"Hello, this is my nice content\n" .
+			'<script src="js/jquery.js"></script>';
 
-$temp = new Template('html', __DIR__ . '/Templates');
+		$this->assertTrue($expected == $temp->show('login', $arrVariables));
 
-$arrVariables = [
-	'title' => 'Test Template',
-	'content' => 'Hello, this is my nice content',
-	'css' => '',
-	'js' => ''
-];
+		// When using "raw" mode, we didn't expect to have CSS and JS
+		// These lines should disappear
+		$temp->setMode('raw');
 
-echo $temp->show('login', $arrVariables);
+		$expected =
+			"Test Template\n" .
+			"\n" .
+			'Hello, this is my nice content';
+		$this->assertTrue($expected == $temp->show('login', $arrVariables));
+	}
+}

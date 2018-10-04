@@ -1,29 +1,29 @@
 <?php
 
-namespace cavo789;
+declare(strict_types=1);
 
-/**
- * Run this script from the command prompt :
- *		php FilesTest.php
- */
+namespace cavo789;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__ . '/Helpers/Utilities.php';
 
 use \cavo789\Helpers\Files as Files;
-use \tests\Helpers\Utilities as Utilities;
+use \PHPUnit\Framework\TestCase;
 
-/**
- * Run the tests
- */
+final class FilesTest extends TestCase
+{
+	public function testFolderExists(): void
+	{
+		$folder = __DIR__ . '/testFolder';
+		Files::makeFolder($folder, true);
 
-echo Utilities::out('Check cavo789\Helpers\Files', true);
+		$this->assertDirectoryExists($folder);
+	}
 
-$folder = __DIR__ . '/testFolder';
-echo Utilities::out('* makeFolder ' . $folder);
-
-Files::makeFolder($folder, true);
-echo Utilities::out('* exists [' . $folder . ']? ==> ' . (Files::exists($folder) ? 'Yes' : 'No'));
-
-$bad = 'folder/subfolder/\'clean",/';
-echo Utilities::out('* sanitize [' . $bad . '] ==> ' . Files::sanitize($bad));
+	public function testSanitize(): void
+	{
+		$folder = 'folder/subfolder/\'clean",/';
+		// Remove bad characters in folder name
+		$this->assertTrue('folder/subfolder/clean/' == Files::sanitize($folder));
+	}
+}
