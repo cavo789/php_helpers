@@ -70,6 +70,7 @@ class ArrayHelper
 
 		// Now process the array and export all rows into a CSV row
 		for ($i = 0; $i < count($arr); $i++) {
+			// @phan-suppress-next-line PhanUnusedVariable
 			foreach ($arr[$i] as $key => $value) {
 				$sCSV .= $value . $delimiter;
 			}

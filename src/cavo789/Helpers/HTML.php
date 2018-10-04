@@ -100,13 +100,11 @@ class HTML
 	 *                                   Works also when URLs are rewritten like
 	 *                                   http://localhost/BOSA/API/clear,
 	 *                                   http://localhost/BOSA/ will be returned
-	 * @param  boolean $root
 	 * @return string
 	 */
 	public static function getCurrentURL(
 		bool $removeScriptName = true,
-		bool $removePathInfo = true,
-		bool $root = true
+		bool $removePathInfo = true
 	) : string {
 		// Determine if it's http or https
 		if (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == '1')) {
