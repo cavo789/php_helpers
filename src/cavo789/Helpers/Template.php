@@ -175,12 +175,20 @@ class Template
 				}
 			}
 
-			// Ok, we're ready for removing any blocks not related
-			// to the current mode (so, if $this->mode is "html", then
-			// we can remove all others blocks for mode "raw" f.i.
-			// Remove our current mode ("html") from $arrFound
-			unset($arrFound[array_search($this->mode, $arrFound)]);
+			// If we the current mode if f.i. "html" and we've in our
+			// $arrFound table "HTML" and "RAW", so we need here to remove
+			// the html entry (since we want to keep conditional HTML blocks)
+			// and only want to remove "RAW" blocks
+			if (array_search($this->mode, $arrFound) !== false) {
+				// Ok, we're ready for removing any blocks not related
+				// to the current mode (so, if $this->mode is "html", then
+				// we can remove all others blocks for mode "raw" f.i.
+				// Remove our current mode ("html") from $arrFound
+				unset($arrFound[array_search($this->mode, $arrFound)]);
+			}
 
+			// $arrFound contains now all conditionals blocks that we
+			// need to remove
 			if (count($arrFound) > 0) {
 				// We've still conditional blocks so remove them
 

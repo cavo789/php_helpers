@@ -49,7 +49,7 @@ class ArrayHelper
 	{
 		$sCSV = '';
 
-		// Emtpy ? Nothing to do
+		// Empty ? Nothing to do
 		if (count($arr) == 0) {
 			return $sCSV;
 		}
