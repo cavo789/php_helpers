@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace cavo789;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
-require_once __DIR__ . '/Helpers/Utilities.php';
 
 use \PHPUnit\Framework\TestCase;
 use \cavo789\Helpers\ArrayHelper as ArrayHelper;
@@ -40,6 +39,38 @@ final class ArrayHelperTest extends TestCase
 			'<link rel="stylesheet" href="demo.css" media="screen"/>';
 
 		$this->assertTrue($expected == $result);
+	}
+
+	/**
+	 * Test array2csv function
+	 *
+	 * @return void
+	 */
+	public function testarray2csv() : void
+	{
+		$arr[] = ['FieldName' => 'FirstName', 'Value' => 'Christophe'];
+		$arr[] = ['FieldName' => 'FirstName', 'Value' => 'Marc'];
+		$arr[] = ['FieldName' => 'FirstName', 'Value' => 'Frédérique'];
+		$value = ArrayHelper::array2csv($arr);
+
+		$expected =
+			'FieldName;Value' . PHP_EOL .
+			'FirstName;Christophe' . PHP_EOL .
+			'FirstName;Marc' . PHP_EOL .
+			'FirstName;Frédérique';
+
+		$this->assertTrue($value == $expected);
+
+		// Use another delimiter
+		$value = ArrayHelper::array2csv($arr, '@');
+
+		$expected =
+			'FieldName@Value' . PHP_EOL .
+			'FirstName@Christophe' . PHP_EOL .
+			'FirstName@Marc' . PHP_EOL .
+			'FirstName@Frédérique';
+
+		$this->assertTrue($value == $expected);
 	}
 
 	/**

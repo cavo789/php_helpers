@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture
  * Written date: 2018-09-13
- * Last modified:
  *
+ * Description
  * cavo789\Class\Session aimed to provide features for
  * working with the $_SESSION object
  *
@@ -25,8 +27,6 @@
  *
  * 		unset($session);
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Classes;
 
@@ -78,7 +78,7 @@ class Session
 		}
 
 		if (!isset($_SESSION)) {
-			if (!session_start()) {
+			if (!@session_start()) {
 				throw new \Exception('The session can\'t be started');
 			} else {
 				$_SESSION[$key_prefix . 'session_id'] = session_id();

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace cavo789;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
-require_once __DIR__ . '/Helpers/Utilities.php';
+// Autoload files using Composer autoload
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use \cavo789\Classes\App as App;
 use \PHPUnit\Framework\TestCase;
@@ -36,6 +36,9 @@ final class AppTest extends TestCase
 
 		// The application.log file should exists
 		$this->assertFileExists(LOGFILE);
+
+		// .htaccess file should be present too
+		$this->assertFileExists(FOLDER . DIRECTORY_SEPARATOR . '.htaccess');
 
 		// Read the file and check that "Debug mode is ON" is there
 		$content = file_get_contents(LOGFILE);

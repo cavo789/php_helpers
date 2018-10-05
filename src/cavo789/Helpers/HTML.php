@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture
  * Written date : 2018-09-13
- * Last modified:
  *
+ * Description
  * HTML Helper
- * Reusable in other projects
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Helpers;
 
@@ -76,12 +75,12 @@ class HTML
 		$flattened = $extra;
 
 		array_walk($flattened, function (&$value, $key) {
-			$value = $key . '="' . $value . '" ';
+			$value = $key . '="' . $value . '"';
 		});
 
 		// Make the link
-		$link = '<a href="' . $url . '" ' . implode(' ', $flattened) . '>' .
-			$text . '</a>';
+		$attribs = trim('href="' . $url . '" ' . implode(' ', $flattened));
+		$link = '<a ' . $attribs . '>' . $text . '</a>';
 
 		return $link;
 	}

@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture
  * Written date : 2018-09-13
- * Last modified:
  *
+ * Description
  * Make it easier to work with html templates
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Helpers;
 

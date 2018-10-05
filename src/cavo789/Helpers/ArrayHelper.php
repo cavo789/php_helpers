@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture (most coming from Laravel framework)
  * Written date : 2018-09-13
- * Last modified:
  *
+ * Description
  * Generic helper functions for working with Arrays
- * Reusable in other projects
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Helpers;
 

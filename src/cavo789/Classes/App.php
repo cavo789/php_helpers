@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture
  * Written date : 2018-09-13
- * Last modified:
  *
+ * Description
  * cavo789\Class\App aimed to provide features for
  * working with the application like enabling or not a debug mode
  *
@@ -23,8 +25,6 @@
  *
  * Require monolog/monolog
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Classes;
 

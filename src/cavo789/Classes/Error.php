@@ -1,13 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture
  * Written date : 2018-09-13
- * Last modified:
- *
- * Inspiration from
- * @link https://www.codepunker.com/blog/handling-php-errors-with-class
- *
+
  * Description
  * Just include this class at the very top of your script and every runtime
  * errors will be captured and displayed through this file.
@@ -39,9 +37,10 @@
  *
  * See the other parameters for more customization
  *
+ * Inspiration from
+ * @link https://www.codepunker.com/blog/handling-php-errors-with-class
+ *
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Classes;
 

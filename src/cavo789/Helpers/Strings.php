@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Christophe Avonture
  * Written date : 2018-09-13
- * Last modified:
  *
+ * Description
  * Strings generic helper
- * Reusable in other projects
  */
-
-declare(strict_types=1);
 
 namespace cavo789\Helpers;
 
