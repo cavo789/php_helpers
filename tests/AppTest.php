@@ -10,38 +10,38 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 use \cavo789\Classes\App as App;
 use \PHPUnit\Framework\TestCase;
 
-define('FOLDER', __DIR__ . '/logs');
-define('LOGFILE', FOLDER . '/application.log');
+define('APP_FOLDER', __DIR__ . '/logs');
+define('APP_LOGFILE', APP_FOLDER . '/application.log');
 
 final class AppTest extends TestCase
 {
 	public function testDebugModeOn(): void
 	{
 		// Be sure to have everytime a fresh file
-		if (file_exists(LOGFILE)) {
-			unlink(LOGFILE);
+		if (file_exists(APP_LOGFILE)) {
+			unlink(APP_LOGFILE);
 		}
 
 		// Initialize the debug mode, create the log folder
 		// and create the application.log file
 
 		$app = App::getInstance(true, [
-			'folder' => FOLDER,
+			'folder' => APP_FOLDER,
 			'trace_deep' => 1,
 			'root' => dirname(__DIR__)
 		]);
 
-		// The folder FOLDER should exists
-		$this->assertDirectoryExists(FOLDER);
+		// The folder APP_FOLDER should exists
+		$this->assertDirectoryExists(APP_FOLDER);
 
 		// The application.log file should exists
-		$this->assertFileExists(LOGFILE);
+		$this->assertFileExists(APP_LOGFILE);
 
 		// .htaccess file should be present too
-		$this->assertFileExists(FOLDER . DIRECTORY_SEPARATOR . '.htaccess');
+		$this->assertFileExists(APP_FOLDER . DIRECTORY_SEPARATOR . '.htaccess');
 
 		// Read the file and check that "Debug mode is ON" is there
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[INFO] Debug mode is ON', $content);
 
 		// Mode is ON
@@ -52,7 +52,7 @@ final class AppTest extends TestCase
 	{
 		$app = App::getInstance();
 		$app->setDebugMode(false);
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 
 		$this->assertContains('[INFO] Debug mode is OFF', $content);
 
@@ -72,15 +72,15 @@ final class AppTest extends TestCase
 		$app->setDebugMode(true);
 
 		$app->log('INFO', 'FAKE-LOG-INFO-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[INFO] FAKE-LOG-INFO-INFORMATION-ABOUT-THINGS', $content);
 
 		$app->log('ALERT', 'FAKE-ALERT-INFO-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[ALERT] FAKE-ALERT-INFO-INFORMATION-ABOUT-THINGS', $content);
 
 		$app->log('EMERGENCY', 'FAKE-LOG-EMERGENCY-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[EMERGENCY] FAKE-LOG-EMERGENCY-INFORMATION-ABOUT-THINGS', $content);
 	}
 
@@ -96,14 +96,14 @@ final class AppTest extends TestCase
 
 		// Output a fake debug and check that the line is well mentioned in the file
 		$app->debug('FAKE-DEBUG-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[DEBUG] FAKE-DEBUG-INFORMATION-ABOUT-THINGS', $content);
 
 		// No DEBUG message recorded in the file when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->debug('DEBUG-NOT-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertNotContains('[DEBUG] DEBUG-NOT-RECORDED', $content);
 	}
 
@@ -119,14 +119,14 @@ final class AppTest extends TestCase
 
 		// Output a fake info and check that the line is well mentioned in the file
 		$app->info('FAKE-INFO-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[INFO] FAKE-INFO-INFORMATION-ABOUT-THINGS', $content);
 
 		// No INFO message recorded in the file when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->debug('INFO-NOT-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertNotContains('[INFO] INFO-NOT-RECORDED', $content);
 	}
 
@@ -142,14 +142,14 @@ final class AppTest extends TestCase
 
 		// Output a fake notice and check that the line is well mentioned in the file
 		$app->notice('FAKE-NOTICE-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[NOTICE] FAKE-NOTICE-INFORMATION-ABOUT-THINGS', $content);
 
 		// No Notice message recorded in the file when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->notice('NOTICE-NOT-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertNotContains('[NOTICE] NOTICE-NOT-RECORDED', $content);
 	}
 
@@ -165,14 +165,14 @@ final class AppTest extends TestCase
 
 		// Output a fake warning and check that the line is well mentioned in the file
 		$app->warning('FAKE-WARNING-INFORMATION-ABOUT-THINGS');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[WARNING] FAKE-WARNING-INFORMATION-ABOUT-THINGS', $content);
 
 		// No Warning message recorded in the file when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->notice('WARNING-NOT-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertNotContains('[WARNING] WARNING-NOT-RECORDED', $content);
 	}
 
@@ -188,14 +188,14 @@ final class AppTest extends TestCase
 
 		// Output a fake error and check that the line is well mentioned in the file
 		$app->error('FAKE-ERROR-MESSAGE');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[ERROR] FAKE-ERROR-MESSAGE', $content);
 
 		// Error message well recorded in the file even when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->error('ERROR-WELL-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[ERROR] ERROR-WELL-RECORDED', $content);
 	}
 
@@ -211,14 +211,14 @@ final class AppTest extends TestCase
 
 		// Output a fake critical and check that the line is well mentioned in the file
 		$app->critical('FAKE-CRITICAL-MESSAGE');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[CRITICAL] FAKE-CRITICAL-MESSAGE', $content);
 
 		// Critical message well recorded in the file even when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->critical('CRITICAL-WELL-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[CRITICAL] CRITICAL-WELL-RECORDED', $content);
 	}
 
@@ -234,14 +234,14 @@ final class AppTest extends TestCase
 
 		// Output a fake alert and check that the line is well mentioned in the file
 		$app->alert('FAKE-ALERT-MESSAGE');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[ALERT] FAKE-ALERT-MESSAGE', $content);
 
 		// Alert message well recorded in the file even when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->alert('ALERT-WELL-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[ALERT] ALERT-WELL-RECORDED', $content);
 	}
 
@@ -257,14 +257,14 @@ final class AppTest extends TestCase
 
 		// Output a fake emergency and check that the line is well mentioned in the file
 		$app->emergency('FAKE-EMERGENCY-MESSAGE');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[EMERGENCY] FAKE-EMERGENCY-MESSAGE', $content);
 
 		// Emergency message well recorded in the file even when debug mode is false
 		$app->setDebugMode(false);
 
 		$app->emergency('EMERGENCY-WELL-RECORDED');
-		$content = file_get_contents(LOGFILE);
+		$content = file_get_contents(APP_LOGFILE);
 		$this->assertContains('[EMERGENCY] EMERGENCY-WELL-RECORDED', $content);
 	}
 }

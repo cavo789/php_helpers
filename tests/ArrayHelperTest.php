@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace cavo789;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
+// Autoload files using Composer autoload
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use \PHPUnit\Framework\TestCase;
 use \cavo789\Helpers\ArrayHelper as ArrayHelper;
-
-define('FOLDER', __DIR__ . '/logs');
-define('LOGFILE', FOLDER . '/application.log');
 
 final class ArrayHelperTest extends TestCase
 {

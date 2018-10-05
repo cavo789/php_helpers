@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace cavo789;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php'; // Autoload files using Composer autoload
-require_once __DIR__ . '/Helpers/Utilities.php';
+// Autoload files using Composer autoload
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use \cavo789\Helpers\HTML as HTML;
 use \PHPUnit\Framework\TestCase;

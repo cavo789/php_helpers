@@ -307,6 +307,8 @@ class Template
 			}
 		}
 
+		$html = str_replace(PHP_EOL, "\n", $html);
+
 		return trim($html, " \n");
 	}
 }
