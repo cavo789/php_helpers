@@ -25,18 +25,19 @@ final class TemplateTest extends TestCase
 		];
 
 		// When using "html" mode, we expect to have CSS and JS
+		// No carriage return, no tabs / spaces between tags since they're not useful
 		$expected =
-			"<!DOCTYPE html>\n" .
-			"<html>\n\n\n\n" .
-			"<head>\n" .
-			"	<meta charset=\"utf-8\">\n" .
-			"	<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n" .
-			"	<title>Test Template</title>\n" .
-			"	<link rel=\"stylesheet\" href=\"http:/assets/css/interface.css\">\n" .
-			"</head>\n\n\n" .
-			"<body class=\"hold-transition login-page\">\n" .
-			"	Hello, this is my nice content\n" .
-			"</body>\n\n" .
+			'<!DOCTYPE html>' .
+			'<html>' .
+			'<head>' .
+			'<meta charset="utf-8">' .
+			'<meta http-equiv="X-UA-Compatible" content="IE=edge">' .
+			'<title>Test Template</title>' .
+			'<link rel="stylesheet" href="http:/assets/css/interface.css">' .
+			'</head>' .
+			'<body class="hold-transition login-page">' .
+			'Hello, this is my nice content' .
+			'</body>' .
 			'</html>';
 
 		$this->assertTrue($expected == $temp->show('login', $arrVariables));
@@ -46,11 +47,11 @@ final class TemplateTest extends TestCase
 		$temp->setMode('raw');
 
 		$expected =
-			"<!DOCTYPE html>\n" .
-			"<html>\n\n\n\n" .
-			"<body class=\"hold-transition login-page\">\n" .
-			"	Hello, this is my nice content\n" .
-			"</body>\n\n" .
+			'<!DOCTYPE html>' .
+			'<html>' .
+			'<body class="hold-transition login-page">' .
+			'Hello, this is my nice content' .
+			'</body>' .
 			'</html>';
 
 		$this->assertTrue($expected == $temp->show('login', $arrVariables));

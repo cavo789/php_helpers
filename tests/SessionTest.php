@@ -16,6 +16,9 @@ final class SessionTest extends TestCase
 	{
 		@session_start();
 
+		// The session can't be started when fired from PHPUnit on CLI
+		$this->expectException('Exception');
+
 		$session = Session::getInstance('MyApp_');
 		// The session will be valid 60 minutes
 		$session->register(60);
@@ -31,6 +34,9 @@ final class SessionTest extends TestCase
 	{
 		@session_start();
 
+		// The session can't be started when fired from PHPUnit on CLI
+		$this->expectException('Exception');
+
 		$session = Session::getInstance('MyApp_');
 
 		// Store a key-value in the session
@@ -43,6 +49,9 @@ final class SessionTest extends TestCase
 	public function testGetAll() : void
 	{
 		@session_start();
+
+		// The session can't be started when fired from PHPUnit on CLI
+		$this->expectException('Exception');
 
 		$session = Session::getInstance('MyApp_');
 
@@ -61,6 +70,9 @@ final class SessionTest extends TestCase
 	public function testRemove() : void
 	{
 		@session_start();
+
+		// The session can't be started when fired from PHPUnit on CLI
+		$this->expectException('Exception');
 
 		$session = Session::getInstance('MyApp_');
 
@@ -81,6 +93,9 @@ final class SessionTest extends TestCase
 	public function testFlashMessage() : void
 	{
 		@session_start();
+
+		// The session can't be started when fired from PHPUnit on CLI
+		$this->expectException('Exception');
 
 		$session = Session::getInstance('MyApp_');
 

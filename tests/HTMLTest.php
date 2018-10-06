@@ -22,17 +22,17 @@ final class HTMLTest extends TestCase
 		// True for adding rel="noopener noreferrer"
 		$result = HTML::makeLink('www.google.be', 'Google', ['class' => 'link'], true);
 		$expected = '<a href="www.google.be" class="link" rel="noopener noreferrer">Google</a>';
-		$this->assertEquals($result, $expected);
+		$this->assertSame($result, $expected);
 
 		// False for not adding rel="noopener noreferrer"
 		$result = HTML::makeLink('www.google.be', 'Google', ['class' => 'link'], false);
 		$expected = '<a href="www.google.be" class="link">Google</a>';
-		$this->assertEquals($result, $expected);
+		$this->assertSame($result, $expected);
 
 		// Lot of extras
 		$result = HTML::makeLink('www.google.be', 'Google', ['class' => 'link', 'data-key' => 'a_key'], false);
 		$expected = '<a href="www.google.be" class="link" data-key="a_key">Google</a>';
-		$this->assertEquals($result, $expected);
+		$this->assertSame($result, $expected);
 
 		// Remove target="_blank"
 		$result = HTML::makeLink(
@@ -43,7 +43,7 @@ final class HTMLTest extends TestCase
 			true
 		);
 		$expected = '<a href="www.google.be">Google</a>';
-		$this->assertEquals($result, $expected);
+		$this->assertSame($result, $expected);
 	}
 
 	/**
@@ -55,7 +55,7 @@ final class HTMLTest extends TestCase
 	{
 		$value = HTML::addCSSTag('style.css');
 		$expected = '<link rel="stylesheet" href="style.css" media="screen"/>';
-		$this->assertEquals($value, $expected);
+		$this->assertSame($value, $expected);
 	}
 
 	/**
@@ -67,7 +67,7 @@ final class HTMLTest extends TestCase
 	{
 		$value = HTML::addJSTag('script.js');
 		$expected = '<script type="text/javascript" src="script.js"></script>';
-		$this->assertEquals($value, $expected);
+		$this->assertSame($value, $expected);
 	}
 
 	/**
@@ -80,7 +80,7 @@ final class HTMLTest extends TestCase
 		$value = '<!-- a comment --><h1>Test</h1><!-- something else -->';
 		$value = HTML::removeHTMLComments($value);
 		$expected = '<h1>Test</h1>';
-		$this->assertEquals($value, $expected);
+		$this->assertSame($value, $expected);
 	}
 
 	/**
@@ -98,7 +98,7 @@ final class HTMLTest extends TestCase
 			'<table><thead><tr><th>col1</th><th>col2</th><th>col3</th></tr></thead>' .
 			'<tbody><tr><td>row1-1</td><td>row1-2</td><td>row1-3</td><td></td></tr>' .
 			'<tr><td>row2-1</td><td>row2-2</td><td>row2-3</td></tr></tbody></table>';
-		$this->assertEquals($value, $expected);
+		$this->assertSame($value, $expected);
 
 		// Enhanced
 		$value = HTML::csv2table($csv, ['enhanced' => true]);
@@ -106,7 +106,7 @@ final class HTMLTest extends TestCase
 			'</thead><tfoot><tr><th>col1</th><th>col2</th><th>col3</th></tr></tfoot>' .
 			'<tbody><tr><td>row1-1</td><td>row1-2</td><td>row1-3</td><td></td></tr>' .
 			'<tr><td>row2-1</td><td>row2-2</td><td>row2-3</td></tr></tbody></table>';
-		$this->assertEquals($value, $expected);
+		$this->assertSame($value, $expected);
 
 		// Enhanced, ID, class, style
 		$value = HTML::csv2table(
@@ -129,7 +129,7 @@ final class HTMLTest extends TestCase
 			'<tfoot><tr><th>col1</th><th>col2</th><th>col3</th></tr></tfoot>' .
 			'<tbody><tr><td>row1-1</td><td>row1-2</td><td>row1-3</td><td></td></tr>' .
 			'<tr><td>row2-1</td><td>row2-2</td><td>row2-3</td></tr></tbody></table>';
-		$this->assertEquals($value, $expected);
+		$this->assertSame($value, $expected);
 	}
 
 	/**
@@ -140,5 +140,26 @@ final class HTMLTest extends TestCase
 	public function testIsAjaxRequest() : void
 	{
 		$this->assertFalse(HTML::isAjaxRequest());
+	}
+
+	/**
+	 * Test compress
+	 *
+	 * @return void
+	 */
+	public function testCompress() :  void
+	{
+		$value =
+			'<section>' .
+			'		<div class="container">		' .
+			'					<div class="row">' .
+			'<!-- CONTENT --><p>Main content</p></div></div></section>';
+
+		$value = HTML::compress($value);
+
+		$expected = '<section><div class="container"><div class="row">' .
+			'<!-- CONTENT --><p>Main content</p></div></div></section>';
+
+		$this->assertSame($expected, $value);
 	}
 }

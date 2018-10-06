@@ -73,6 +73,7 @@ final class ArrayHelperTest extends TestCase
 
 	/**
 	 * Test array_get function
+	 * Get the value of a key in an associative array using the "dot" notation
 	 *
 	 * @return void
 	 */
@@ -91,6 +92,29 @@ final class ArrayHelperTest extends TestCase
 		$arr = ArrayHelper::array_get($arr, 'cdn.css');
 		$expected = ['style.css', 'interface.css', 'demo.css'];
 		$this->assertTrue($arr == $expected);
+	}
+
+	/**
+	 * Test array_set function
+	 * Update the value of a key in an associative array using the "dot" notation
+	 *
+	 * @return void
+	 */
+	public function testarray_set() : void
+	{
+		// Create an associative array
+		$json = '{ "cdn" : { "enabled" : "1", "css" : [ "style.css", "interface.css", "demo.css" ] } }';
+		$arr = json_decode($json, true);
+
+		// Use dot notation to retrieve a key; get "cdn.enabled"
+		// Retrieve a boolean
+		$value = boolval(ArrayHelper::array_get($arr, 'cdn.enabled'));
+		$this->assertTrue($value);
+
+		// Change the value, set it to false
+		ArrayHelper::array_set($arr, 'cdn.enabled', 0);
+		$value = boolval(ArrayHelper::array_get($arr, 'cdn.enabled'));
+		$this->assertFalse($value);
 	}
 
 	/**

@@ -19,6 +19,11 @@ class HTML
 	/**
 	 * Create a link ("<a href="...">...</a>)
 	 *
+	 * @example
+	 *
+	 * HTML::makeLink('www.google.be', 'Google', ['class' => 'link'], true);
+	 * Will return '<a href="www.google.be" class="link" rel="noopener noreferrer">Google</a>';
+	 *
 	 * @param  string $url               The URL like f.i. www.google.be
 	 * @param  string $text              The text like "Click here to ..."
 	 * @param  array  $extra             Any extra parameter (rel, target, class, ...)
@@ -297,6 +302,11 @@ class HTML
 	 * Check if the $style also contains the <link> tag, if not,
 	 * add the tag
 	 *
+	 * @example
+	 *
+	 * HTML::addCSSTag('style.css');
+	 * Will return '<link rel="stylesheet" href="style.css" media="screen"/>';
+	 *
 	 * @param  string $style
 	 * @return string
 	 */
@@ -313,6 +323,11 @@ class HTML
 	/**
 	 * Check if the $script also contains the <script> tag, if not,
 	 * add the tag
+	 *
+	 * @example
+	 *
+	 * HTML::addJSTag('script.js');
+	 * Will return <script type="text/javascript" src="script.js"></script>
 	 *
 	 * @param  string $script
 	 * @return string
@@ -347,9 +362,11 @@ class HTML
 	/**
 	 * Parse the HTML string and remove comments
 	 *
-	 * Example :
-	 * 	$html = '<!-- a comment --><h1>Test</h1><!-- something else -->';
-	 * 	$result = removeHTMLComments($html);  ' return <h1>Test</h1>
+	 * @example
+	 *
+	 * $value = '<!-- a comment --><h1>Test</h1><!-- something else -->';
+	 *	HTML::removeHTMLComments($value);
+	 * Will return '<h1>Test</h1>';
 	 *
 	 * @param  string $html
 	 * @return string The HTML string without comments
@@ -367,6 +384,17 @@ class HTML
 	 * Convert as CSV string into a HTML table
 	 *
 	 * @suppress PhanUnusedVariable
+	 *
+	 * @example
+	 *
+	 * $csv = "col1;col2;col3\nrow1-1;row1-2;row1-3;\nrow2-1;row2-2;row2-3";
+	 *
+	 * $value = HTML::csv2table($csv);
+	 *
+	 * Will return
+	 *		'<table><thead><tr><th>col1</th><th>col2</th><th>col3</th></tr></thead>' .
+	 * 	'<tbody><tr><td>row1-1</td><td>row1-2</td><td>row1-3</td><td></td></tr>' .
+	 *		'<tr><td>row2-1</td><td>row2-2</td><td>row2-3</td></tr></tbody></table>';
 	 *
 	 * @param string $sCSV  A comma separated content	 *
 	 * @param array  $extra Optional
@@ -497,5 +525,36 @@ class HTML
 		'</table>';
 
 		return $table;
+	}
+
+	/**
+	 * In HTML, tabs, spaces, linefeed (LF) and carriage returns (CR) are not needed
+	 * between HTML tags. This function will remove them making the HTML code more compact.
+	 *
+	 * @example
+	 *
+	 * $value =
+	 *		'<section>' .
+	 *		'		<div class="container">		' .
+	 *		'					<div class="row">' .
+	 *		'<!-- CONTENT --><p>Main content</p></div></div></section>';
+	 *
+	 *	HTML::compress($value) will return <section><div class="container">
+	 *		<div class="row"><!-- CONTENT --><p>Main content</p></div></div></section>
+	 *
+	 * Every unneeded spaces between tags are removed
+	 *
+	 * @see https://github.com/padosoft/support/blob/master/src/string.php#L714
+	 *
+	 * @param  string $value HTML string
+	 * @return string Same string but without unneeded spaces between tags
+	 */
+	public static function compress(string $value) : string
+	{
+		return preg_replace(
+			['/\>[^\S ]+/s', '/[^\S ]+\</s', '/(\s)+/s'],
+			['>', '<', '\\1'],
+			$value
+		);
 	}
 }

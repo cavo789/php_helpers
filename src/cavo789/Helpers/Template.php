@@ -285,6 +285,9 @@ class Template
 		// Remove any <!-- html comments -->
 		$html = HTML::removeHTMLComments($html);
 
+		// Remove unneeded spaces between html tags
+		$html = HTML::compress($html);
+
 		$url = HTML::getCurrentURL(true);
 		$html = str_replace('{{ url }}', $url, $html);
 
