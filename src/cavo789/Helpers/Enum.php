@@ -16,31 +16,31 @@ namespace cavo789\Helpers;
 
 abstract class Enum
 {
-	/**
-	 * Constructor
-	 *
-	 * @suppress PhanUndeclaredProperty
-	 *
-	 * @param mixed $value
-	 */
-	final public function __construct($value)
-	{
-		$c = new \ReflectionClass($this);
-		if (!in_array($value, $c->getConstants())) {
-			throw new \InvalidArgumentException($value . ' isn\'t..');
-		}
-		$this->value = $value;
-	}
+    /**
+     * Constructor
+     *
+     * @suppress PhanUndeclaredProperty
+     *
+     * @param mixed $value
+     */
+    final public function __construct($value)
+    {
+        $c = new \ReflectionClass($this);
+        if (!in_array($value, $c->getConstants())) {
+            throw new \InvalidArgumentException($value . ' isn\'t..');
+        }
+        $this->value = $value;
+    }
 
-	/**
-	 * Undocumented function
-	 *
-	 * @suppress PhanUndeclaredProperty
-	 *
-	 * @return string
-	 */
-	final public function __toString() : string
-	{
-		return $this->value;
-	}
+    /**
+     * Undocumented function
+     *
+     * @suppress PhanUndeclaredProperty
+     *
+     * @return string
+     */
+    final public function __toString() : string
+    {
+        return $this->value;
+    }
 }
