@@ -3,3 +3,4 @@
 /tests/logs/*
 /vendor
 phan.bat
+.php_cs.cache
