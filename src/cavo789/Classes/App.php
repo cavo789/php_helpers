@@ -31,6 +31,7 @@ namespace cavo789\Classes;
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 use \cavo789\Helpers\Files as Files;
+use \cavo789\Exception\AppException As AppException;
 use \Psr\Log\LoggerInterface as LoggerInterface;
 use \Monolog\Logger as Logger;
 use \Monolog\Handler\StreamHandler as StreamHandler;
@@ -64,30 +65,70 @@ define('DEBUG_DELETE_PREVIOUS', false);
 
 class App implements LoggerInterface
 {
-    // Log filename for application debug message
+    /**
+     * Log filename for application debug message
+     * 
+     * @var string
+     * @access private
+     */
     private $app_log = 'application.log';
 
-    // Log filename for errors occurs when the script was running
+    /**
+     * Log filename for errors occurs when the script was running
+     * 
+     * @var string
+     * @access private
+     */
     private $error_log = 'error.log';
 
-    // The log object
+    /**
+     * The log object
+     *
+     * @var \Monolog\Logger
+     */
     private $log = null;
 
-    // Folder when the application.log will be stored
+    /**
+     * Folder when the application.log will be stored
+     * 
+     * @var string
+     * @access private
+     */
     private $folder = '';
 
-    // Root folder of the application
+    /**
+     * Root folder of the application
+     * 
+     * @var string
+     */
     private $root = '';
 
-    // Debugging mode state (On / Off)
+    /**
+     * Debugging mode state (On / Off)
+     * 
+     * @var bool
+     * @access private
+     */
     private $debugMode = false;
 
-    // Monolog handler
+    /**
+     * Monolog StreamHandler
+     *
+     * @var \Monolog\Handler\StreamHandler
+     */
     private $log_handler = null;
 
+    /**
+     * Deep of the trace (how many parent's informations should be dumped)
+     * 
+     * @var int
+     * @access private
+     */
     private $trace_deep = 0;
 
     /**
+     * Singleton to App
+     * 
      * @var App
      * @access private
      * @static
@@ -108,7 +149,7 @@ class App implements LoggerInterface
      * @param boolean $debugMode False will hide errors in the browser
      *                           True will activate a verbose mode
      *
-     * @param  array $extra
+     * @param mixed[] $extra 
      *                      'root'       = Root folder of the application (default: __DIR__)
      *                      'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
      *                      'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
@@ -149,12 +190,13 @@ class App implements LoggerInterface
 
         // Store information's into the /Logs/application.log file
 
+        // @phan-suppress-next-line
         if (DEBUG_DELETE_PREVIOUS) {
             if (file_exists($log = $this->folder . $this->app_log)) {
                 try {
                     unlink($log);
-                } catch (\Exception $e) {
-                    throw new \Exception(sprintf('The file %s can\'t be removed', $log), 0, $e);
+                } catch (AppException $e) {
+                    throw new AppException(sprintf('The file %s can\'t be removed', $log), 0, $e);
                 }
             }
         }
@@ -187,7 +229,7 @@ class App implements LoggerInterface
      * @param boolean $debugMode False will hide errors in the browser
      *                           True will activate a verbose mode
      *
-     * @param array $extra
+     * @param mixed[] $extra
      *                     'root'        = Root folder of the application (default: __DIR__)
      *                     'folder'        = Absolute folder name where to create the logfile (default: __DIR__)
      *                     'prefix'        = Prefix to use for entries in the logfile (default: 'APP')
@@ -201,7 +243,7 @@ class App implements LoggerInterface
         bool $debugMode = false,
         array $extra = []
     ) : App {
-        if (is_null(self::$_instance)) {
+        if (NULL == self::$_instance) {
             self::$_instance = new App($debugMode, $extra);
         }
 
@@ -290,16 +332,20 @@ class App implements LoggerInterface
      * @param mixed  $level   The log level
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []) : void
     {
         if ($this->trace_deep > -1) {
             $trace = debug_backtrace();
 
             $j = (count($trace) > $this->trace_deep) ? $this->trace_deep : count($trace);
 
+            $arrTrace = [];
+
+            $i=0;
+            
             try {
-                $arrTrace = [];
                 for ($i = 0; $i <= $j; $i++) {
                     if (!isset($trace[$i])) {
                         // No more items in the trace, exit the loop
@@ -315,7 +361,12 @@ class App implements LoggerInterface
                     unset($trace[$i]['type']);
                     $arrTrace[$i] = $trace[$i];
                 }
-            } catch (\Exception $e) {
+            } catch (AppException $e) {
+                throw new AppException(
+                    sprintf('Error when outputting a trace; $i is equal to %d',$i ), 
+                    0, 
+                    $e
+                );
             }
 
             $context['trace'] = $arrTrace;
@@ -331,10 +382,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function debug($message, array $context = [])
+    public function debug($message, array $context = []) : void
     {
-        self::log(LOGGER::DEBUG, (string) $message, $context);
+        self::log(LOGGER::DEBUG, $message, $context);
     }
 
     /**
@@ -344,10 +396,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function info($message, array $context = [])
+    public function info($message, array $context = []) : void
     {
-        self::log(LOGGER::INFO, (string) $message, $context);
+        self::log(LOGGER::INFO, $message, $context);
     }
 
     /**
@@ -357,10 +410,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function notice($message, array $context = [])
+    public function notice($message, array $context = []) : void
     {
-        self::log(LOGGER::NOTICE, (string) $message, $context);
+        self::log(LOGGER::NOTICE, $message, $context);
     }
 
     /**
@@ -370,10 +424,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function warning($message, array $context = [])
+    public function warning($message, array $context = []) : void
     {
-        self::log(LOGGER::WARNING, (string) $message, $context);
+        self::log(LOGGER::WARNING, $message, $context);
     }
 
     /**
@@ -383,10 +438,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function error($message, array $context = [])
+    public function error($message, array $context = []) : void
     {
-        self::log(LOGGER::ERROR, (string) $message, $context);
+        self::log(LOGGER::ERROR, $message, $context);
     }
 
     /**
@@ -396,10 +452,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function critical($message, array $context = [])
+    public function critical($message, array $context = []) : void
     {
-        self::log(LOGGER::CRITICAL, (string) $message, $context);
+        self::log(LOGGER::CRITICAL, $message, $context);
     }
 
     /**
@@ -409,10 +466,11 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function alert($message, array $context = [])
+    public function alert($message, array $context = []) : void
     {
-        self::log(LOGGER::ALERT, (string) $message, $context);
+        self::log(LOGGER::ALERT, $message, $context);
     }
 
     /**
@@ -422,9 +480,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     * @return void
      */
-    public function emergency($message, array $context = [])
+    public function emergency($message, array $context = []) : void
     {
-        self::log(LOGGER::EMERGENCY, (string) $message, $context);
+        self::log(LOGGER::EMERGENCY, $message, $context);
     }
 }

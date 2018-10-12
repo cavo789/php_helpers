@@ -31,12 +31,22 @@ declare(strict_types=1);
 namespace cavo789\Classes;
 
 use cavo789\Helpers\Strings as Strings;
+use cavo789\Exception\SessionException As SessionException;
 
 class Session
 {
+    /**
+     * Prefix to add for each session's key
+     *
+     * @var string
+     */
     private $key_prefix = '';
 
-    // Default duration for a session (15 minutes)
+    /**
+     * Default duration for a session (15 minutes)
+     *
+     * @var integer
+     */
     private $duration = 15;
 
     /**
@@ -58,6 +68,12 @@ class Session
     private function __construct(string $key_prefix = '')
     {
         $this->key_prefix = trim($key_prefix) ?? '';
+
+        if (!@session_start()) {
+            throw new SessionException('The session can\'t be started');
+        } else {
+            $_SESSION[$key_prefix . 'session_id'] = session_id();
+        }
     }
 
     /**
@@ -71,18 +87,10 @@ class Session
      *
      * @return Session
      */
-    public static function getInstance(string $key_prefix = '')
+    public static function getInstance(string $key_prefix = '') : Session
     {
-        if (is_null(self::$_instance)) {
+        if (NULL == self::$_instance) {
             self::$_instance = new Session($key_prefix);
-        }
-
-        if (!isset($_SESSION)) {
-            if (!@session_start()) {
-                throw new \Exception('The session can\'t be started');
-            } else {
-                $_SESSION[$key_prefix . 'session_id'] = session_id();
-            }
         }
 
         return self::$_instance;

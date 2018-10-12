@@ -21,10 +21,20 @@ use \cavo789\Helpers\HTML as HTML;
 class Template
 {
     // Folder where .html templates can be found
+    /**
+     * @var string
+     */
     private $folder = '';
 
     // Define the output mode (can be html, raw, ...)
+    /**
+     * @var string
+     */
     private $mode = 'html';
+
+    /**
+     * @var array
+     */
     private $arrSupportedMode = ['html', 'raw'];
 
     /**
