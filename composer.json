@@ -28,9 +28,7 @@
   "autoload": {
     "psr-4": {
       "cavo789\\": [
-        "src/cavo789/Classes/",
-        "src/cavo789/Exception/",
-        "src/cavo789/Helpers/"
+        "src/cavo789/"
       ]
     }
   }
