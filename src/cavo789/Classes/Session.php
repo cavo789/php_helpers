@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture
- * Written date: 2018-09-13
+ * Written date: 2018-09-13.
  *
  * Description
  * cavo789\Class\Session aimed to provide features for
@@ -31,21 +31,21 @@ declare(strict_types=1);
 namespace cavo789\Classes;
 
 use cavo789\Helpers\Strings as Strings;
-use cavo789\Exception\SessionException As SessionException;
+use cavo789\Exception\SessionException as SessionException;
 
 class Session
 {
     /**
-     * Prefix to add for each session's key
+     * Prefix to add for each session's key.
      *
      * @var string
      */
-    private $key_prefix = '';
+    private $keyPrefix = '';
 
     /**
-     * Default duration for a session (15 minutes)
+     * Default duration for a session (15 minutes).
      *
-     * @var integer
+     * @var int
      */
     private $duration = 15;
 
@@ -54,85 +54,91 @@ class Session
      * @access private
      * @static
      */
-    private static $_instance = null;
+    private static $instance = null;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $key_prefix Keys added by this class
-     *                           can have a prefix to make sure that there will
-     *                           be no conflict with other running script.
-     *                           Specify f.i. "MySuperSoft_" to have all your keys
-     *                           prefixed with that pattern.
+     * @param string $keyPrefix Keys added by this class
+     *                          can have a prefix to make sure that there will
+     *                          be no conflict with other running script.
+     *                          Specify f.i. "MySuperSoft_" to have all your keys
+     *                          prefixed with that pattern.
      */
-    private function __construct(string $key_prefix = '')
+    private function __construct(string $keyPrefix = '')
     {
-        $this->key_prefix = trim($key_prefix) ?? '';
+        $this->keyPrefix = trim($keyPrefix) ?? '';
 
         if (!@session_start()) {
             throw new SessionException('The session can\'t be started');
         } else {
-            $_SESSION[$key_prefix . 'session_id'] = session_id();
+            $_SESSION[$keyPrefix . 'session_id'] = session_id();
         }
     }
 
     /**
-     * Load an instance of the class
+     * Load an instance of the class.
      *
-     * @param string $key_prefix Keys added by this class
-     *                           can have a prefix to make sure that there will
-     *                           be no conflict with other running script.
-     *                           Specify f.i. "MySuperSoft_" to have all your keys
-     *                           prefixed with that pattern.
+     * @param string $keyPrefix Keys added by this class
+     *                          can have a prefix to make sure that there will
+     *                          be no conflict with other running script.
+     *                          Specify f.i. "MySuperSoft_" to have all your keys
+     *                          prefixed with that pattern.
      *
      * @return Session
      */
-    public static function getInstance(string $key_prefix = '') : Session
+    public static function getInstance(string $keyPrefix = '') : Session
     {
-        if (NULL == self::$_instance) {
-            self::$_instance = new Session($key_prefix);
+        if (null == self::$instance) {
+            self::$instance = new Session($keyPrefix);
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
      * Destroys the session.
+     *
+     * @return void
      */
     public function destroy()
     {
-        if (isset($_SESSION)) {
+        try {
             if (session_id()) {
                 session_destroy();
             }
             $_SESSION = [];
+        } catch (\Exception $e) {
+            throw new SessionException('The session can\'t be destroyed', 0, $e);
         }
     }
 
     /**
      * Register the session.
      *
-     * @param integer $duration Expressed in minutes, the length of time
-     *                          during which the session will be considered valid
+     * @param int $duration Expressed in minutes, the length of time
+     *                      during which the session will be considered valid
+     *
+     * @return void
      */
     public function register(int $duration = 15)
     {
         $this->duration = $duration;
-        self::set('session_validUntil', self::validUntil());
+        self::setInt('session_validUntil', self::validUntil());
     }
 
     /**
      * Checks if the session has been registered. When the session
      * has expired, this function will return False too.
      *
-     * @return boolean True if it is, False if not.
+     * @return bool True if it is, False if not.
      */
     public function isRegistered() : bool
     {
         if (self::isExpired()) {
             return false;
         } else {
-            if (trim(strval(self::get('session_id', ''))) !== '') {
+            if (trim(strval(self::getString('session_id', ''))) !== '') {
                 return true;
             } else {
                 return false;
@@ -143,11 +149,11 @@ class Session
     /**
      * Checks to see if the session is still valid (expired?).
      *
-     * @return boolean
+     * @return bool
      */
     public function isExpired()
     {
-        if (self::get('session_validUntil') < time()) {
+        if (self::getInt('session_validUntil') < time()) {
             // When the session is expired, destory the session
             // to remove any sensitive information's
             //self::destroy();
@@ -159,24 +165,73 @@ class Session
     }
 
     /**
-     * Set key/value in session.
+     * Set key/value in session when the value is an integer.
      *
      * @param string $key
-     * @param  $value
+     * @param int    $value
      */
-    public function set(string $key, $value)
+    public function setInt(string $key, int $value)
     {
         $_SESSION[self::getKey($key)] = $value;
     }
 
     /**
-     * Retrieve value stored in session by key.
+     * Set key/value in session when the value is a string.
      *
-     * @param  string $key     Entry to retrieve
-     * @param         $default Default value
-     * @return mixed
+     * @param string $key
+     * @param string $value
      */
-    public function get(string $key, $default = null) : mixed
+    public function setString(string $key, string $value)
+    {
+        $_SESSION[self::getKey($key)] = $value;
+    }
+
+    /**
+     * Set key/value in session when value is an array.
+     *
+     * @param string $key
+     * @param array  $value
+     */
+    public function setArray(string $key, array $value)
+    {
+        $_SESSION[self::getKey($key)] = $value;
+    }
+
+    /**
+     * Retrieve an integer value stored in session by key.
+     *
+     * @param string $key     Entry to retrieve
+     * @param int    $default Default value
+     *
+     * @return int
+     */
+    public function getInt(string $key, int $default = 0) : int
+    {
+        return $_SESSION[self::getKey($key)] ?? $default;
+    }
+
+    /**
+     * Retrieve a string value stored in session by key.
+     *
+     * @param string $key     Entry to retrieve
+     * @param string $default Default value
+     *
+     * @return string
+     */
+    public function getString(string $key, string $default = '') : string
+    {
+        return $_SESSION[self::getKey($key)] ?? $default;
+    }
+
+    /**
+     * Retrieve an array value stored in session by key.
+     *
+     * @param string $key     Entry to retrieve
+     * @param array  $default Default value
+     *
+     * @return array
+     */
+    public function getArray(string $key, array $default = []) : array
     {
         return $_SESSION[self::getKey($key)] ?? $default;
     }
@@ -185,21 +240,23 @@ class Session
      * Store a flash message into the Session. On the first call,
      * the message will be removed.
      *
-     * @param  string $key
-     * @param  string $value
+     * @param string $key
+     * @param string $value
+     *
      * @return void
      */
     public function flash(string $key, string $value)
     {
-        self::set('flash.' . $key, $value);
+        self::setString('flash.' . $key, $value);
     }
 
     /**
      * Get a flash message. Once obtained, the message will be removed
-     * from the Session variables
+     * from the Session variables.
      *
-     * @param  string $key
-     * @param  string $default
+     * @param string $key
+     * @param string $default
+     *
      * @return string
      */
     public function getFlash(string $key, string $default = '') : string
@@ -207,7 +264,7 @@ class Session
         $value = $default;
 
         if (isset($_SESSION[self::getKey('flash.' . $key)])) {
-            $value = strval(self::get('flash.' . $key, $default));
+            $value = strval(self::getString('flash.' . $key, $default));
             self::remove('flash.' . $key);
         }
 
@@ -226,8 +283,8 @@ class Session
         // Take care to remove the prefix before returning the
         // list of keys in the $_SESSION
         foreach ($_SESSION as $key => $value) {
-            if (Strings::startsWith($key, $this->key_prefix)) {
-                $key = substr($key, strlen($this->key_prefix));
+            if (Strings::startsWith($key, $this->keyPrefix)) {
+                $key = substr($key, strlen($this->keyPrefix));
 
                 // Returns only our object; the ones starting with
                 // our prefix
@@ -239,9 +296,10 @@ class Session
     }
 
     /**
-     * Remove a key from the Session collection
+     * Remove a key from the Session collection.
      *
-     * @param  string $key Key to remove
+     * @param string $key Key to remove
+     *
      * @return void
      */
     public function remove(string $key)
@@ -258,32 +316,33 @@ class Session
      */
     public function getSessionId() : string
     {
-        return strval(self::get('session_id'));
+        return strval(self::getString('session_id', ''));
     }
 
     /**
-     * Extends the current session
+     * Extends the current session.
      */
     public function extends()
     {
-        self::set('session_validUntil', self::validUntil());
+        self::setInt('session_validUntil', self::validUntil());
     }
 
     /**
-     * Simply add the prefix to the requested key
+     * Simply add the prefix to the requested key.
      *
-     * @param  string $key
+     * @param string $key
+     *
      * @return string
      */
     private function getKey(string $key) : string
     {
-        return $this->key_prefix . $key;
+        return $this->keyPrefix . $key;
     }
 
     /**
      * Calculate the end validity time of the session
      * (i.e. probably now() + 15 minutes which is the
-     * default duration for a session (see $this->duration))
+     * default duration for a session (see $this->duration)).
      *
      * @return int timestamp
      */

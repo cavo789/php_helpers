@@ -38,26 +38,97 @@ declare(strict_types=1);
  * See the other parameters for more customization
  *
  * Inspiration from
- * @link https://www.codepunker.com/blog/handling-php-errors-with-class
  *
+ * @link https://www.codepunker.com/blog/handling-php-errors-with-class
  */
 
 namespace cavo789\Classes;
 
+/**
+ * @suppress PhanCompatibleVoidTypePHP70
+ */
 class Error
 {
+    /**
+     * Capture the microtime when this class is fired.
+     *
+     * @var float
+     * @access private
+     */
     private $startTime = 0;
+
+    /**
+     * HTML string or filename that contains the template for
+     * displaying an error.
+     *
+     * @var string
+     */
     private $template = '';
+
+    /**
+     * Timezone to use for displaying date/times.
+     * For instance 'Europe/Brussels'.
+     *
+     * @var string
+     * @access private
+     */
     private $timezone = '';
+
+    /**
+     * How to display date/time (f.i. D M Y H:i:s).
+     *
+     * @var string
+     * @access private
+     */
     private $dateFormat = '';
-    private $tag_message = '{{ error_message }}';
-    private $tag_code = '{{ error_code }}';
-    private $tag_title = '{{ error_title }}';
 
-    private $http_returned_errorcode = 400;
-    private $http_returned_errortitle = 'Bad Request';
+    /**
+     * The tag to search for where to put the error message.
+     *
+     * @var string
+     * @access private
+     */
+    private $tagMessage = '{{ error_message }}';
 
-    // When no template are specified, the error will be displayed using this one:
+    /**
+     * The tag to search for where to put the error code.
+     *
+     * @var string
+     * @access private
+     */
+    private $tagCode = '{{ error_code }}';
+
+    /**
+     * The tag to search for where to put the error title.
+     *
+     * @var string
+     * @access private
+     */
+    private $tagTitle = '{{ error_title }}';
+
+    /**
+     * Error code to sent with the HTTP headers.
+     *
+     * @var int
+     * @access private
+     */
+    private $httpReturnedErrorCode = 400;
+
+    /**
+     * Associated text for the HTTP error code.
+     *
+     * @var string
+     * @access private
+     */
+    private $httpReturnedErrorTitle = 'Bad Request';
+
+    /**
+     * When no template are specified, the error will be displayed
+     * using the following one.
+     *
+     * @var string
+     * @access private
+     */
     private $defaultTemplate = '<pre style="background-color:orange;padding:25px;">%s</pre>';
 
     /**
@@ -65,29 +136,29 @@ class Error
      * @access private
      * @static
      */
-    private static $_instance = null;
+    private static $instance = null;
 
     /**
-     * Initialize the class
+     * Initialize the class.
      *
-     * @param string $template    HTML string or full name of the file to use as template
-     *                            for displaying errors
-     * @param string $timezone    Timezone like Europe/Paris
-     * @param string $dateFormat  How to display date/time (f.i. D M Y H:i:s)
-     * @param string $tag_message When using a template, text to search for replacing it
-     *                            by the error message (default is {{ error_message }})
-     * @param string $tag_code    When using a template, the error code will be inserted
-     *                            when the mentioned tag is found (default is {{ error_code }})
-     * @param string $tag_title   When using a template, the error code will be inserted
-     *                            when the mentioned title is found (default is {{ error_title }})
+     * @param string $template   HTML string or full name of the file to use as template
+     *                           for displaying errors
+     * @param string $timezone   Timezone like Europe/Paris
+     * @param string $dateFormat How to display date/time (f.i. D M Y H:i:s)
+     * @param string $tagMessage When using a template, text to search for replacing it
+     *                           by the error message (default is {{ error_message }})
+     * @param string $tagCode    When using a template, the error code will be inserted
+     *                           when the mentioned tag is found (default is {{ error_code }})
+     * @param string $tagTitle   When using a template, the error code will be inserted
+     *                           when the mentioned title is found (default is {{ error_title }})
      */
     private function __construct(
         string $template = '',
         string $timezone = 'Europe/Brussels',
         string $dateFormat = 'd M Y H:i:s',
-        string $tag_message = '{{ error_message }}',
-        string $tag_code = '{{ error_code }}',
-        string $tag_title = '{{ error_title }}'
+        string $tagMessage = '{{ error_message }}',
+        string $tagCode = '{{ error_code }}',
+        string $tagTitle = '{{ error_title }}'
     ) {
         $this->startTime = microtime(true);
 
@@ -103,16 +174,16 @@ class Error
         // When using a template, the position where the error message should be
         // inserted is, by default, defined by the "{{ error_message }}" tag. That tag
         // can be changed using the $tag parameter.
-        if (trim($tag_message) !== '') {
-            $this->tag_message = $tag_message;
+        if (trim($tagMessage) !== '') {
+            $this->tagMessage = $tagMessage;
         }
         // Same for the code
-        if (trim($tag_code) !== '') {
-            $this->tag_code = $tag_code;
+        if (trim($tagCode) !== '') {
+            $this->tagCode = $tagCode;
         }
         // Same for the title
-        if (trim($tag_title) !== '') {
-            $this->tag_title = $tag_title;
+        if (trim($tagTitle) !== '') {
+            $this->tagTitle = $tagTitle;
         }
 
         ob_start();
@@ -127,17 +198,17 @@ class Error
     }
 
     /**
-     * Load an instance of the class
+     * Load an instance of the class.
      *
-     * @param string $template    HTML string or full name of the file to use as template
-     *                            for displaying errors
-     * @param string $timezone    Timezone like Europe/Paris
-     * @param string $dateFormat  How to display date/time (f.i. D M Y H:i:s)
-     * @param string $tag_message When using a template, text to search for replacing it
-     *                            by the error message (default is {{ error_message }})
-     * @param string $tag_code    When using a template, the error code will be inserted
-     *                            when the mentioned tag is found (default is {{ error_code }})
-     * @param string $tag_title   When using a template, the error code will be inserted
+     * @param string $template   HTML string or full name of the file to use as template
+     *                           for displaying errors
+     * @param string $timezone   Timezone like Europe/Paris
+     * @param string $dateFormat How to display date/time (f.i. D M Y H:i:s)
+     * @param string $tagMessage When using a template, text to search for replacing it
+     *                           by the error message (default is {{ error_message }})
+     * @param string $tagCode    When using a template, the error code will be inserted
+     *                           when the mentioned tag is found (default is {{ error_code }})
+     * @param string $tagTitle   When using a template, the error code will be inserted
      *
      * @return Error
      */
@@ -145,30 +216,30 @@ class Error
         string $template = '',
         string $timezone = 'Europe/Brussels',
         string $dateFormat = 'd M Y H:i:s',
-        string $tag_message = '{{ error_message }}',
-        string $tag_code = '{{ error_code }}',
-        string $tag_title = '{{ error_title }}'
-    ) {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new Error(
+        string $tagMessage = '{{ error_message }}',
+        string $tagCode = '{{ error_code }}',
+        string $tagTitle = '{{ error_title }}'
+    ) : Error {
+        if (null == self::$instance) {
+            self::$instance = new Error(
                 $template,
                 $timezone,
                 $dateFormat,
-                $tag_message,
-                $tag_code,
-                $tag_title
+                $tagMessage,
+                $tagCode,
+                $tagTitle
             );
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
-     * Check if the http request is an AJAX call
+     * Check if the http request is an AJAX call.
      *
-     * @return boolean
+     * @return bool
      */
-    private function is_ajax() : bool
+    private function isAjax() : bool
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             (strtolower(getenv('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest');
@@ -189,9 +260,10 @@ class Error
      *
      * @see https://stackoverflow.com/a/5404966/1065340
      *
-     * @param  \DOMNode $element A DOM element (can be a <p>, <h.>, <div>, ...)
-     * @param  boolean  $outer   When true, the element itself is taken
-     * @return string   The outer HTML of the element
+     * @param \DOMNode $element A DOM element (can be a <p>, <h.>, <div>, ...)
+     * @param bool     $outer   When true, the element itself is taken
+     *
+     * @return string The outer HTML of the element
      */
     public function getDOMHTML(\DOMNode $element, bool $outer = true) : string
     {
@@ -216,21 +288,22 @@ class Error
     }
 
     /**
-     * An error has been encountered, display it
+     * An error has been encountered, display it.
      *
      * @suppress PhanUnusedVariableCaughtException
      *
-     * @param  integer $errno
-     * @param  string  $errstr
-     * @param  string  $errfile
-     * @param  integer $errline
+     * @param int    $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param int    $errline
+     *
      * @return void
      */
     public function scriptError(int $errno, string $errstr, string $errfile, int $errline)
     {
         if (!headers_sent()) {
-            header('HTTP/1.1 ' . $this->http_returned_errorcode . ' ' .
-                $this->http_returned_errortitle);
+            header('HTTP/1.1 ' . $this->httpReturnedErrorCode . ' ' .
+                $this->httpReturnedErrorTitle);
         }
 
         if (ob_get_contents() !== false) {
@@ -297,7 +370,7 @@ class Error
             '<br/><br/>';
 
         // Default template when none has been specified in the constructor
-        $html = sprintf($this->defaultTemplate, $this->tag_message);
+        $html = sprintf($this->defaultTemplate, $this->tagMessage);
 
         if ($this->template !== '') {
             // A template has been specified; is it a file or a string?
@@ -305,39 +378,39 @@ class Error
                 try {
                     $html = file_get_contents($this->template);
                 } catch (\Exception $e) {
-                    $html = $this->tag_message;
+                    $html = $this->tagMessage;
                 }
             } else {
                 $html = $this->template;
             }
         }
 
-        if (strpos($html, $this->tag_message) !== false) {
-            $html = str_replace($this->tag_message, trim($error), $html);
+        if (strpos($html, $this->tagMessage) !== false) {
+            $html = str_replace($this->tagMessage, trim($error), $html);
         } else {
             $html .= trim($error);
         }
 
-        $html = str_replace($this->tag_code, strval($this->http_returned_errorcode), $html);
-        $html = str_replace($this->tag_title, $this->http_returned_errortitle, $html);
+        $html = str_replace($this->tagCode, strval($this->httpReturnedErrorCode), $html);
+        $html = str_replace($this->tagTitle, $this->httpReturnedErrorTitle, $html);
 
-        /**
+        /*
          * Detect if the request was made by an AJAX call and if yes,
          * detect if the HTML template contains a "main".
          * If still yes, extract that portion (only the <div class="main">...</div>)
          * element so, when using Ajax, we will not send http tags like meta, title, ...
          * nor body, script and style; only the required info i.e. the error message
          */
-        if (self::is_ajax()) {
+        if (self::isAjax()) {
             $dom = new \DOMDocument();
             @libxml_use_internal_errors(true);
 
             $dom->loadHTML($html);
             // Search for a class called "main"
-            $class_name = 'main';
+            $className = 'main';
             $xpath = new \DOMXPath($dom);
 
-            $nodeList = $xpath->query("//div[contains(@class, '" . $class_name . "')]");
+            $nodeList = $xpath->query("//div[contains(@class, '" . $className . "')]");
 
             if ($nodeList->length > 0) {
                 // If found, extract the outer html for that element
@@ -348,6 +421,12 @@ class Error
         echo $html;
     }
 
+    /**
+     * The execution of the PHP script has been stopped.
+     * If due to a catchable error, display an error message.
+     *
+     * @return void
+     */
     public function shutdown()
     {
         if ($error = error_get_last()) {

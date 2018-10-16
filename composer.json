@@ -22,15 +22,20 @@
   },
   "minimum-stability": "dev",
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.1.0",
     "monolog/monolog": "^2.0@dev"
   },
   "autoload": {
     "psr-4": {
-      "cavo789\\": "src/cavo789/"
+      "cavo789\\": [
+        "src/cavo789/Classes",
+        "src/cavo789/Exception",
+        "src/cavo789/Helpers"
+      ]
     }
   },
   "require-dev": {
-    "phan/phan": "dev-master"
+    "phan/phan": "dev-master",
+    "phpunit/phpunit": "^7.5@dev"
   }
 }

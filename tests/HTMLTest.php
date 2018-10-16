@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
-
-// Autoload files using Composer autoload
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+namespace cavo789\tests;
 
 use \cavo789\Helpers\HTML as HTML;
 use \PHPUnit\Framework\TestCase;
@@ -13,11 +10,11 @@ use \PHPUnit\Framework\TestCase;
 final class HTMLTest extends TestCase
 {
     /**
-     * Test makeLink()
+     * Test makeLink().
      *
      * @return void
      */
-    public function testMakeLink() : void
+    public function testMakeLink()
     {
         // True for adding rel="noopener noreferrer"
         $result = HTML::makeLink('www.google.be', 'Google', ['class' => 'link'], true);
@@ -47,11 +44,11 @@ final class HTMLTest extends TestCase
     }
 
     /**
-     * Test addCSSTag()
+     * Test addCSSTag().
      *
      * @return void
      */
-    public function testAddCSSTag() : void
+    public function testAddCSSTag()
     {
         $value = HTML::addCSSTag('style.css');
         $expected = '<link rel="stylesheet" href="style.css" media="screen"/>';
@@ -59,11 +56,11 @@ final class HTMLTest extends TestCase
     }
 
     /**
-     * Test AddJSTag
+     * Test AddJSTag.
      *
      * @return void
      */
-    public function testAddJSTag() : void
+    public function testAddJSTag()
     {
         $value = HTML::addJSTag('script.js');
         $expected = '<script type="text/javascript" src="script.js"></script>';
@@ -71,11 +68,11 @@ final class HTMLTest extends TestCase
     }
 
     /**
-     * Test RemoveHTMLComments
+     * Test RemoveHTMLComments.
      *
      * @return void
      */
-    public function testRemoveHTMLComments() : void
+    public function testRemoveHTMLComments()
     {
         $value = '<!-- a comment --><h1>Test</h1><!-- something else -->';
         $value = HTML::removeHTMLComments($value);
@@ -84,11 +81,11 @@ final class HTMLTest extends TestCase
     }
 
     /**
-     * Test csv2table
+     * Test csv2table.
      *
      * @return void
      */
-    public function testCsv2table() : void
+    public function testCsv2table()
     {
         $csv = "col1;col2;col3\nrow1-1;row1-2;row1-3;\nrow2-1;row2-2;row2-3";
 
@@ -133,21 +130,21 @@ final class HTMLTest extends TestCase
     }
 
     /**
-     * Test isAjaxRequest
+     * Test isAjaxRequest.
      *
      * @return void
      */
-    public function testIsAjaxRequest() : void
+    public function testIsAjaxRequest()
     {
         $this->assertFalse(HTML::isAjaxRequest());
     }
 
     /**
-     * Test compress
+     * Test compress.
      *
      * @return void
      */
-    public function testCompress() :  void
+    public function testCompress()
     {
         $value =
             '<section>' .

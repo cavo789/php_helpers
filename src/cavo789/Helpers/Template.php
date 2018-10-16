@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * Make it easier to work with html templates
@@ -38,7 +38,7 @@ class Template
     private $arrSupportedMode = ['html', 'raw'];
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @throws \InvalidArgumentException When the folder name if mentioned and doesn't exists on disk
      *
@@ -64,27 +64,29 @@ class Template
     }
 
     /**
-     * Define the mode (f.i. "html" or "raw")
+     * Define the mode (f.i. "html" or "raw").
      *
      * @throws \InvalidArgumentException When the mode isn't supported
      *
-     * @param  string $mode
+     * @param string $mode
+     *
      * @return void
      */
     public function setMode(string $mode = 'html')
     {
         $this->mode = trim($mode);
-        if (!in_array($this->mode, $this->arrSupportedMode)) {
+        if (!in_array($this->mode, $this->arrSupportedMode, true)) {
             throw new \InvalidArgumentException(sprintf('The %s mode isn\'t supported', $this->mode));
         }
     }
 
     /**
-     * Return the full name to a template
+     * Return the full name to a template.
      *
      * @throws \InvalidArgumentException when $name is not found i.e. the file didn't exists
      *
-     * @param  string $name For instance "index"
+     * @param string $name For instance "index"
+     *
      * @return string
      */
     private function getTemplate(string $name) : string
@@ -110,7 +112,8 @@ class Template
      * This function will use a do ... while because an included file can
      * also have inclusions
      *
-     * @param  string $html
+     * @param string $html
+     *
      * @return string
      */
     private function processInclusions(string $html) : string
@@ -136,7 +139,7 @@ class Template
     }
 
     /**
-     * The HTML template can contains conditional blocks like:
+     * The HTML template can contains conditional blocks like:.
      *
      *      <!-- @if_html_start-->
      *          <link rel="stylesheet" href="assets/css/interface.css">
@@ -157,7 +160,8 @@ class Template
      *
      * So, if the mode isn't that one, remove the entire block
      *
-     * @param  string $html The HTML template
+     * @param string $html The HTML template
+     *
      * @return string The same HTML but without these conditional blocks
      */
     private function removeConditionalModeBlocks(string $html) : string
@@ -180,7 +184,7 @@ class Template
             //  <!-- @if_raw_start-->...<!-- @if_raw_end-->
             // then $arrFound will contains ['html', 'raw']
             foreach ($matches[1] as $match) {
-                if (!in_array($match, $arrFound)) {
+                if (!in_array($match, $arrFound, true)) {
                     $arrFound[] = $match;
                 }
             }
@@ -189,12 +193,12 @@ class Template
             // $arrFound table "HTML" and "RAW", so we need here to remove
             // the html entry (since we want to keep conditional HTML blocks)
             // and only want to remove "RAW" blocks
-            if (array_search($this->mode, $arrFound) !== false) {
+            if (array_search($this->mode, $arrFound, true) !== false) {
                 // Ok, we're ready for removing any blocks not related
                 // to the current mode (so, if $this->mode is "html", then
                 // we can remove all others blocks for mode "raw" f.i.
                 // Remove our current mode ("html") from $arrFound
-                unset($arrFound[array_search($this->mode, $arrFound)]);
+                unset($arrFound[array_search($this->mode, $arrFound, true)]);
             }
 
             // $arrFound contains now all conditionals blocks that we
@@ -217,7 +221,7 @@ class Template
     }
 
     /**
-     * The HTML template can contains conditional blocks like:
+     * The HTML template can contains conditional blocks like:.
      *
      *      <!-- @if_full_start-->
      *          <link rel="stylesheet" href="assets/css/interface.css">
@@ -244,7 +248,8 @@ class Template
      *
      * to indicate that these lines should be removed when called by Ajax
      *
-     * @param  string $html The HTML template
+     * @param string $html The HTML template
+     *
      * @return string The same HTML but without these conditional blocks
      */
     private function removeConditionalRequestBlocks(string $html) : string
@@ -267,10 +272,11 @@ class Template
     }
 
     /**
-     * Return the HTML of the template
+     * Return the HTML of the template.
      *
-     * @param  string $template
-     * @param  array  $arrVariables
+     * @param string  $template
+     * @param mixed[] $arrVariables
+     *
      * @return string
      */
     public function show(
@@ -302,14 +308,14 @@ class Template
         $html = str_replace('{{ url }}', $url, $html);
 
         $app = App::getInstance();
-        $html = str_replace('{{ debug }}', strval($app->getDebugMode() ? 1 : 0), $html);
+        $html = str_replace('{{ debug }}', strval($app->isDebugMode() ? 1 : 0), $html);
 
         /**
          * The HTML template can contains user tags like
          *  {{ download_html }}
          *  {{ download_pdf }}
          *      {{ new_window_html }}
-         *      {{ my_own_tag }}
+         *      {{ my_own_tag }}.
          *
          * Get the list of key-value pair in the $arrVariables array and if one
          * key is mentioned in the file replace the tag by its value

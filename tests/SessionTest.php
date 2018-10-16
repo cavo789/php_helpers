@@ -2,17 +2,14 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
-
-// Autoload files using Composer autoload
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+namespace cavo789\tests;
 
 use \cavo789\Classes\Session as Session;
 use \PHPUnit\Framework\TestCase;
 
 final class SessionTest extends TestCase
 {
-    public function testGetInstance() : void
+    public function testGetInstance()
     {
         @session_start();
 
@@ -30,7 +27,7 @@ final class SessionTest extends TestCase
         $this->assertFalse($session->isExpired());
     }
 
-    public function testKeys() : void
+    public function testKeys()
     {
         @session_start();
 
@@ -40,13 +37,19 @@ final class SessionTest extends TestCase
         $session = Session::getInstance('MyApp_');
 
         // Store a key-value in the session
-        $session->set('Password', 'MyPassword');
+        $session->setString('Password', 'MyPassword');
 
-        $value = $session->get('Password', 'Oups...');
+        $value = $session->getString('Password', 'Oups...');
         $this->assertTrue($value == 'MyPassword');
+
+        // Store a key-value in the session
+        $session->setInt('Age', 42);
+
+        $value = $session->getInt('Age');
+        $this->assertSame($value, 42);
     }
 
-    public function testGetAll() : void
+    public function testGetAll()
     {
         @session_start();
 
@@ -56,10 +59,11 @@ final class SessionTest extends TestCase
         $session = Session::getInstance('MyApp_');
 
         // Store a key-value in the session
-        $session->set('Password', 'MyPassword');
-        $session->set('User', ['lastname' => 'Doe', 'firstname' => 'John']);
+        $session->setString('Password', 'MyPassword');
+        $session->setArray('User', ['lastname' => 'Doe', 'firstname' => 'John']);
 
         $value = $session->getAll();
+        $expected = [];
         $expected['Password'] = 'MyPassword';
         $expected['User']['lastname'] = 'Doe';
         $expected['User']['firstname'] = 'John';
@@ -67,7 +71,7 @@ final class SessionTest extends TestCase
         $this->assertTrue($value == $expected);
     }
 
-    public function testRemove() : void
+    public function testRemove()
     {
         @session_start();
 
@@ -77,8 +81,8 @@ final class SessionTest extends TestCase
         $session = Session::getInstance('MyApp_');
 
         // Store a key-value in the session
-        $session->set('Password', 'MyPassword');
-        $value = $session->get('Password', '#NOTFOUND');
+        $session->setString('Password', 'MyPassword');
+        $value = $session->getString('Password', '#NOTFOUND');
         $expected = 'MyPassword';
 
         $this->assertTrue($value == $expected);
@@ -86,11 +90,11 @@ final class SessionTest extends TestCase
         // Remove the password so on next call, we can't retrieve
         // the password
         $session->remove('Password');
-        $value = $session->get('Password', '#NOTFOUND');
+        $value = $session->getString('Password', '#NOTFOUND');
         $this->assertFalse($value == $expected);
     }
 
-    public function testFlashMessage() : void
+    public function testFlashMessage()
     {
         @session_start();
 

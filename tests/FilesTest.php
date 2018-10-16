@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
-
-// Autoload files using Composer autoload
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+namespace cavo789\tests;
 
 use \cavo789\Helpers\Files as Files;
 use \PHPUnit\Framework\TestCase;
@@ -13,11 +10,11 @@ use \PHPUnit\Framework\TestCase;
 final class FilesTest extends TestCase
 {
     /**
-     * Test makeFolder
+     * Test makeFolder.
      *
      * @return void
      */
-    public function testFolderExists(): void
+    public function testFolderExists()
     {
         $folder = __DIR__ . '/testFolder';
         Files::makeFolder($folder, true);
@@ -30,21 +27,21 @@ final class FilesTest extends TestCase
     }
 
     /**
-     * Test exists
+     * Test exists.
      *
      * @return void
      */
-    public function testExists() : void
+    public function testExists()
     {
         $this->assertTrue(Files::exists(__FILE__));
     }
 
     /**
-     * Test sanitize
+     * Test sanitize.
      *
      * @return void
      */
-    public function testSanitize(): void
+    public function testSanitize()
     {
         $folder = 'folder/subfolder/\'clean",/';
         // Remove bad characters in folder name

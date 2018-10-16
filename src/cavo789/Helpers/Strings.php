@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * Strings generic helper
@@ -21,9 +21,11 @@ class Strings
      *
      * @link https://stackoverflow.com/a/834355/1065340
 
-     * @param  string  $string The string
-     * @param  string  $prefix The prefix to search
-     * @return boolean True when the string is ending with that prefix
+     *
+     * @param string $string The string
+     * @param string $prefix The prefix to search
+     *
+     * @return bool True when the string is ending with that prefix
      */
     public static function startsWith(string $string, string $prefix) : bool
     {
@@ -39,9 +41,11 @@ class Strings
      *
      * @link https://stackoverflow.com/a/834355/1065340
 
-     * @param  string  $string The string
-     * @param  string  $suffix The suffix to search
-     * @return boolean True when the string is ending with that suffix
+     *
+     * @param string $string The string
+     * @param string $suffix The suffix to search
+     *
+     * @return bool True when the string is ending with that suffix
      */
     public static function endsWith(string $string, string $suffix): bool
     {
@@ -55,9 +59,10 @@ class Strings
     }
 
     /**
-     * Make a few cleaning so we can have a proper value
+     * Make a few cleaning so we can have a proper value.
      *
-     * @param  string $value
+     * @param string $value
+     *
      * @return string
      */
     public static function cleansing(string $value) : string

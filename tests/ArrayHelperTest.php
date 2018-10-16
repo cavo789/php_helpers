@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
-
-// Autoload files using Composer autoload
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+namespace cavo789\tests;
 
 use \PHPUnit\Framework\TestCase;
 use \cavo789\Helpers\ArrayHelper as ArrayHelper;
@@ -13,11 +10,11 @@ use \cavo789\Helpers\ArrayHelper as ArrayHelper;
 final class ArrayHelperTest extends TestCase
 {
     /**
-     * Test array2string function
+     * Test array2string function.
      *
      * @return void
      */
-    public function testarray2string() : void
+    public function testarray2string()
     {
         $arr = ['style.css', 'interface.css', 'demo.css'];
         $result = ArrayHelper::array2string($arr);
@@ -40,12 +37,14 @@ final class ArrayHelperTest extends TestCase
     }
 
     /**
-     * Test array2csv function
+     * Test array2csv function.
      *
      * @return void
      */
-    public function testarray2csv() : void
+    public function testarray2csv()
     {
+        $arr = [];
+
         $arr[] = ['FieldName' => 'FirstName', 'Value' => 'Christophe'];
         $arr[] = ['FieldName' => 'FirstName', 'Value' => 'Marc'];
         $arr[] = ['FieldName' => 'FirstName', 'Value' => 'Frédérique'];
@@ -72,12 +71,12 @@ final class ArrayHelperTest extends TestCase
     }
 
     /**
-     * Test array_get function
-     * Get the value of a key in an associative array using the "dot" notation
+     * Test arrayGet function
+     * Get the value of a key in an associative array using the "dot" notation.
      *
      * @return void
      */
-    public function testarray_get() : void
+    public function testarrayGet()
     {
         // Create an associative array
         $json = '{ "cdn" : { "enabled" : "1", "css" : [ "style.css", "interface.css", "demo.css" ] } }';
@@ -85,22 +84,22 @@ final class ArrayHelperTest extends TestCase
 
         // Use dot notation to retrieve a key; get "cdn.enabled"
         // Retrieve a boolean
-        $value = boolval(ArrayHelper::array_get($arr, 'cdn.enabled'));
+        $value = boolval(ArrayHelper::arrayGet($arr, 'cdn.enabled'));
         $this->assertTrue($value);
 
         // Retrieve an array
-        $arr = ArrayHelper::array_get($arr, 'cdn.css');
+        $arr = ArrayHelper::arrayGet($arr, 'cdn.css');
         $expected = ['style.css', 'interface.css', 'demo.css'];
         $this->assertTrue($arr == $expected);
     }
 
     /**
-     * Test array_set function
-     * Update the value of a key in an associative array using the "dot" notation
+     * Test arraySet function
+     * Update the value of a key in an associative array using the "dot" notation.
      *
      * @return void
      */
-    public function testarray_set() : void
+    public function testarraySet()
     {
         // Create an associative array
         $json = '{ "cdn" : { "enabled" : "1", "css" : [ "style.css", "interface.css", "demo.css" ] } }';
@@ -108,21 +107,21 @@ final class ArrayHelperTest extends TestCase
 
         // Use dot notation to retrieve a key; get "cdn.enabled"
         // Retrieve a boolean
-        $value = boolval(ArrayHelper::array_get($arr, 'cdn.enabled'));
+        $value = boolval(ArrayHelper::arrayGet($arr, 'cdn.enabled'));
         $this->assertTrue($value);
 
         // Change the value, set it to false
-        ArrayHelper::array_set($arr, 'cdn.enabled', 0);
-        $value = boolval(ArrayHelper::array_get($arr, 'cdn.enabled'));
+        ArrayHelper::arraySet($arr, 'cdn.enabled', 0);
+        $value = boolval(ArrayHelper::arrayGet($arr, 'cdn.enabled'));
         $this->assertFalse($value);
     }
 
     /**
-     * Test transpose function
+     * Test transpose function.
      *
      * @return void
      */
-    public function testtranspose() : void
+    public function testtranspose()
     {
         // Define a two dimensional array
         $arr = [];

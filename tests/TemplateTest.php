@@ -2,17 +2,14 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
-
-// Autoload files using Composer autoload
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+namespace cavo789\tests;
 
 use \cavo789\Helpers\Template as Template;
 use \PHPUnit\Framework\TestCase;
 
 final class TemplateTest extends TestCase
 {
-    public function testShowTemplate(): void
+    public function testShowTemplate()
     {
         // Process the HTML and replace variables and return his HTML
         $temp = new Template('html', __DIR__ . DIRECTORY_SEPARATOR . 'Templates');

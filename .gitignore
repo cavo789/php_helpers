@@ -1,4 +1,6 @@
 /.vscode
+/build/*
+/docs/*
 /tests/testFolder/*
 /tests/logs/*
 /vendor

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * cavo789\Class\App aimed to provide features for
@@ -31,7 +31,7 @@ namespace cavo789\Classes;
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 use \cavo789\Helpers\Files as Files;
-use \cavo789\Exception\AppException As AppException;
+use \cavo789\Exception\AppException as AppException;
 use \Psr\Log\LoggerInterface as LoggerInterface;
 use \Monolog\Logger as Logger;
 use \Monolog\Handler\StreamHandler as StreamHandler;
@@ -66,77 +66,77 @@ define('DEBUG_DELETE_PREVIOUS', false);
 class App implements LoggerInterface
 {
     /**
-     * Log filename for application debug message
-     * 
+     * Log filename for application debug message.
+     *
      * @var string
      * @access private
      */
-    private $app_log = 'application.log';
+    private $appLogFileName = 'application.log';
 
     /**
-     * Log filename for errors occurs when the script was running
-     * 
+     * Log filename for errors occurs when the script was running.
+     *
      * @var string
      * @access private
      */
-    private $error_log = 'error.log';
+    private $errorLogFileName = 'error.log';
 
     /**
-     * The log object
+     * The log object.
      *
      * @var \Monolog\Logger
      */
     private $log = null;
 
     /**
-     * Folder when the application.log will be stored
-     * 
+     * Folder when the application.log will be stored.
+     *
      * @var string
      * @access private
      */
     private $folder = '';
 
     /**
-     * Root folder of the application
-     * 
+     * Root folder of the application.
+     *
      * @var string
      */
     private $root = '';
 
     /**
-     * Debugging mode state (On / Off)
-     * 
+     * Debugging mode state (On / Off).
+     *
      * @var bool
      * @access private
      */
     private $debugMode = false;
 
     /**
-     * Monolog StreamHandler
+     * Monolog StreamHandler.
      *
      * @var \Monolog\Handler\StreamHandler
      */
-    private $log_handler = null;
+    private $logHandler = null;
 
     /**
-     * Deep of the trace (how many parent's informations should be dumped)
-     * 
+     * Deep of the trace (how many parent's informations should be dumped).
+     *
      * @var int
      * @access private
      */
-    private $trace_deep = 0;
+    private $traceDeep = 0;
 
     /**
-     * Singleton to App
-     * 
+     * Singleton to App.
+     *
      * @var App
      * @access private
      * @static
      */
-    private static $_instance = null;
+    private static $instance = null;
 
     /**
-     * Private function: please use App::getInstance() instead
+     * Private function: please use App::getInstance() instead.
      *
      * Depending on the $debug parameter, enable / disable the
      * PHP error mode i.e. show extra infos (enable) or don't
@@ -146,16 +146,16 @@ class App implements LoggerInterface
      * folder, f.i.
      *         __DIR__.'error.log'
      *
-     * @param boolean $debugMode False will hide errors in the browser
+     * @param bool    $debugMode False will hide errors in the browser
      *                           True will activate a verbose mode
+     * @param mixed[] $extra
+     *                           'root'       = Root folder of the application (default: __DIR__)
+     *                           'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
+     *                           'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
+     *                           'timezone'   = Timezone to get the correct date/time info (default: 'Europe/Brussels')
+     *                           'dateFormat' = Date format (default: DEBUG_DATE)
+     *                           'traceDeep' = How many callers should be taken in each log entry?
      *
-     * @param mixed[] $extra 
-     *                      'root'       = Root folder of the application (default: __DIR__)
-     *                      'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
-     *                      'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
-     *                      'timezone'   = Timezone to get the correct date/time info (default: 'Europe/Brussels')
-     *                      'dateFormat' = Date format (default: DEBUG_DATE)
-     *                      'trace_deep' = How many callers should be taken in each log entry?
      * @return void
      */
     private function __construct(
@@ -169,7 +169,7 @@ class App implements LoggerInterface
         $this->root = $extra['root'] ?? __DIR__;
         $this->root = rtrim(str_replace('/', DS, $this->root), DS) . DS;
 
-        $this->trace_deep = intval($extra['trace_deep'] ?? DEBUG_TRACE_DEEP);
+        $this->traceDeep = intval($extra['traceDeep'] ?? DEBUG_TRACE_DEEP);
 
         // Check if the folder exists and if not, create it
         // Create the folder if needed
@@ -178,7 +178,7 @@ class App implements LoggerInterface
         }
 
         // Informs PHP where to store errors
-        ini_set('error_log', $this->folder . $this->error_log);
+        ini_set('error_log', $this->folder . $this->errorLogFileName);
 
         // create a log channel (by using monolog)
         $this->log = new Logger($extra['prefix'] ?? 'APP');
@@ -192,7 +192,7 @@ class App implements LoggerInterface
 
         // @phan-suppress-next-line
         if (DEBUG_DELETE_PREVIOUS) {
-            if (file_exists($log = $this->folder . $this->app_log)) {
+            if (file_exists($log = $this->folder . $this->appLogFileName)) {
                 try {
                     unlink($log);
                 } catch (AppException $e) {
@@ -200,14 +200,14 @@ class App implements LoggerInterface
                 }
             }
         }
-        $this->log_handler = new StreamHandler($this->folder . $this->app_log, $level);
+        $this->logHandler = new StreamHandler($this->folder . $this->appLogFileName, $level);
 
         // How a line in the log should looks like
         $formatter = new LineFormatter(DEBUG_TEMPLATE . "\n", $extra['dateFormat'] ?? DEBUG_DATE);
-        $this->log_handler->setFormatter($formatter);
+        $this->logHandler->setFormatter($formatter);
 
         // Use the handler
-        $this->log->pushHandler($this->log_handler);
+        $this->log->pushHandler($this->logHandler);
 
         // Set timezone and date to match our configuration
         $this->log->setTimezone(new \DateTimeZone($extra['timezone'] ?? DEBUG_TIMEZONE));
@@ -223,19 +223,20 @@ class App implements LoggerInterface
      * This class should be loaded only once so if called
      * in several PHP scripts, we need to avoid to load the
      * class again and again. For this, use getInstance() to
-     * load a Singleton and return the $_instance pointer as
-     * from the second class
+     * load a Singleton and return the $instance pointer as
+     * from the second class.
      *
-     * @param boolean $debugMode False will hide errors in the browser
+     * @param bool    $debugMode False will hide errors in the browser
      *                           True will activate a verbose mode
-     *
      * @param mixed[] $extra
-     *                     'root'        = Root folder of the application (default: __DIR__)
-     *                     'folder'        = Absolute folder name where to create the logfile (default: __DIR__)
-     *                     'prefix'        = Prefix to use for entries in the logfile (default: 'APP')
-     *                     'timezone'     = Timezone to get the correct date/time info (default: 'Europe/Brussels')
-     *                     'dateFormat' = Date format (default: DEBUG_DATE)
-     *                     'trace_deep' = How many callers should be taken in each log entry? (default: DEBUG_TRACE_DEEP)
+     *                           'root'       = Root folder of the application (default: __DIR__)
+     *                           'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
+     *                           'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
+     *                           'timezone'   = Timezone to get the correct date/time
+     *                           info (default: 'Europe/Brussels')
+     *                           'dateFormat' = Date format (default: DEBUG_DATE)
+     *                           'traceDeep'  = How many callers should be taken in
+     *                           each log entry? (default: DEBUG_TRACE_DEEP)
      *
      * @return App
      */
@@ -243,17 +244,18 @@ class App implements LoggerInterface
         bool $debugMode = false,
         array $extra = []
     ) : App {
-        if (NULL == self::$_instance) {
-            self::$_instance = new App($debugMode, $extra);
+        if (null == self::$instance) {
+            self::$instance = new App($debugMode, $extra);
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
-     * Set the debugging mode
+     * Set the debugging mode.
      *
-     * @param  boolean $onOff
+     * @param bool $onOff
+     *
      * @return void
      */
     public function setDebugMode(bool $onOff = false)
@@ -267,7 +269,7 @@ class App implements LoggerInterface
             : 'OFF, output only Error, Critical, Alert and Emergency')
         );
 
-        $this->log_handler->setLevel($this->debugMode ? Logger::DEBUG : Logger::ERROR);
+        $this->logHandler->setLevel($this->debugMode ? Logger::DEBUG : Logger::ERROR);
 
         // When debug mode is on, we want to see every messages; even notice.
         if ($this->debugMode === true) {
@@ -289,18 +291,18 @@ class App implements LoggerInterface
     }
 
     /**
-     * Return true / false depending on the state of the debug mode flag
+     * Return true / false depending on the state of the debug mode flag.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getDebugMode() : bool
+    public function isDebugMode() : bool
     {
         return $this->debugMode;
     }
 
     /**
      * Output in the application log information's about the context
-     * of the current script
+     * of the current script.
      *
      * @return void
      */
@@ -332,19 +334,20 @@ class App implements LoggerInterface
      * @param mixed  $level   The log level
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function log($level, $message, array $context = []) : void
+    public function log($level, $message, array $context = [])
     {
-        if ($this->trace_deep > -1) {
+        if ($this->traceDeep > -1) {
             $trace = debug_backtrace();
 
-            $j = (count($trace) > $this->trace_deep) ? $this->trace_deep : count($trace);
+            $j = (count($trace) > $this->traceDeep) ? $this->traceDeep : count($trace);
 
             $arrTrace = [];
 
-            $i=0;
-            
+            $i = 0;
+
             try {
                 for ($i = 0; $i <= $j; $i++) {
                     if (!isset($trace[$i])) {
@@ -363,8 +366,8 @@ class App implements LoggerInterface
                 }
             } catch (AppException $e) {
                 throw new AppException(
-                    sprintf('Error when outputting a trace; $i is equal to %d',$i ), 
-                    0, 
+                    sprintf('Error when outputting a trace; $i is equal to %d', $i),
+                    0,
                     $e
                 );
             }
@@ -382,9 +385,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function debug($message, array $context = []) : void
+    public function debug($message, array $context = [])
     {
         self::log(LOGGER::DEBUG, $message, $context);
     }
@@ -396,9 +400,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function info($message, array $context = []) : void
+    public function info($message, array $context = [])
     {
         self::log(LOGGER::INFO, $message, $context);
     }
@@ -410,9 +415,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function notice($message, array $context = []) : void
+    public function notice($message, array $context = [])
     {
         self::log(LOGGER::NOTICE, $message, $context);
     }
@@ -424,9 +430,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function warning($message, array $context = []) : void
+    public function warning($message, array $context = [])
     {
         self::log(LOGGER::WARNING, $message, $context);
     }
@@ -438,9 +445,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function error($message, array $context = []) : void
+    public function error($message, array $context = [])
     {
         self::log(LOGGER::ERROR, $message, $context);
     }
@@ -452,9 +460,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function critical($message, array $context = []) : void
+    public function critical($message, array $context = [])
     {
         self::log(LOGGER::CRITICAL, $message, $context);
     }
@@ -466,9 +475,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function alert($message, array $context = []) : void
+    public function alert($message, array $context = [])
     {
         self::log(LOGGER::ALERT, $message, $context);
     }
@@ -480,9 +490,10 @@ class App implements LoggerInterface
      *
      * @param string $message The log message
      * @param array  $context The log context
+     *
      * @return void
      */
-    public function emergency($message, array $context = []) : void
+    public function emergency($message, array $context = [])
     {
         self::log(LOGGER::EMERGENCY, $message, $context);
     }

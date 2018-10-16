@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * Files and folders generic helper
@@ -16,10 +16,11 @@ class Files
 {
     /**
      * Create a folder and, if requested, add a deny from all
-     * configuration file
+     * configuration file.
      *
-     * @param  string  $path Full path of the folder to create
-     * @param  boolean $deny Add a .htaccess file with a DENY FROM ALL
+     * @param string $path Full path of the folder to create
+     * @param bool   $deny Add a .htaccess file with a DENY FROM ALL
+     *
      * @return void
      */
     public static function makeFolder(string $path, bool $deny = true)
@@ -41,10 +42,11 @@ class Files
     }
 
     /**
-     * Check if a file exists
+     * Check if a file exists.
      *
-     * @param  string  $name
-     * @return boolean
+     * @param string $name
+     *
+     * @return bool
      */
     public static function exists(string $name) : bool
     {
@@ -54,9 +56,10 @@ class Files
     /**
      * Sanitize a file/folder name; remove dangerous characters
      * Allow / and \ to allow to identify a subfolder
-     * Allow : since used under Windows
+     * Allow : since used under Windows.
      *
-     * @param  string $name
+     * @param string $name
+     *
      * @return string
      */
     public static function sanitize(string $name) : string

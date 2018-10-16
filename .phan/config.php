@@ -292,6 +292,7 @@ return [
 		'vendor/monolog/monolog/src/Monolog',
 		'vendor/psr/log/Psr/Log',
 		'vendor/phan/phan/src/Phan',
+		'vendor/phpunit/phpunit/src',
 	],
 
 	// A list of individual files to include in analysis

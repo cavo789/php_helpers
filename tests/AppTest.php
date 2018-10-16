@@ -2,20 +2,17 @@
 
 declare(strict_types=1);
 
-namespace cavo789;
+namespace cavo789\tests;
 
 define('APP_FOLDER', __DIR__ . '/logs');
 define('APP_LOGFILE', APP_FOLDER . '/application.log');
 
-// Autoload files using Composer autoload
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-
 use \cavo789\Classes\App as App;
-use \PHPUnit\Framework\TestCase;
+use \PHPUnit\Framework\TestCase as TestCase;
 
 final class AppTest extends TestCase
 {
-    public function testDebugModeOn(): void
+    public function testIsDebugModeOn()
     {
         // Be sure to have everytime a fresh file
         if (file_exists(APP_LOGFILE)) {
@@ -27,7 +24,7 @@ final class AppTest extends TestCase
 
         $app = App::getInstance(true, [
             'folder' => APP_FOLDER,
-            'trace_deep' => 1,
+            'TraceDeep' => 1,
             'root' => dirname(__DIR__)
         ]);
 
@@ -45,10 +42,10 @@ final class AppTest extends TestCase
         $this->assertContains('[INFO] Debug mode is ON', $content);
 
         // Mode is ON
-        $this->assertTrue($app->getDebugMode());
+        $this->assertTrue($app->isDebugMode());
     }
 
-    public function testDebugModeOff(): void
+    public function testIsDebugModeOff()
     {
         $app = App::getInstance();
         $app->setDebugMode(false);
@@ -57,15 +54,15 @@ final class AppTest extends TestCase
         $this->assertContains('[INFO] Debug mode is OFF', $content);
 
         // Mode is OFF
-        $this->assertTrue(!($app->getDebugMode()));
+        $this->assertTrue(!($app->isDebugMode()));
     }
 
     /**
-     * Test the log() method with different levels
+     * Test the log() method with different levels.
      *
      * @return void
      */
-    public function testLogMsg() : void
+    public function testLogMsg()
     {
         $app = App::getInstance();
 
@@ -85,11 +82,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the debug() method
+     * Test the debug() method.
      *
      * @return void
      */
-    public function testDebugMsg(): void
+    public function testDebugMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);
@@ -108,11 +105,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the info() method
+     * Test the info() method.
      *
      * @return void
      */
-    public function testInfoMsg(): void
+    public function testInfoMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);
@@ -131,11 +128,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the notice() method
+     * Test the notice() method.
      *
      * @return void
      */
-    public function testNoticeMsg(): void
+    public function testNoticeMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);
@@ -154,11 +151,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the warning() method
+     * Test the warning() method.
      *
      * @return void
      */
-    public function testWarningMsg() : void
+    public function testWarningMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);
@@ -177,11 +174,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the error() method
+     * Test the error() method.
      *
      * @return void
      */
-    public function testErrorMsg() : void
+    public function testErrorMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(false);
@@ -200,11 +197,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the critical() method
+     * Test the critical() method.
      *
      * @return void
      */
-    public function testCriticalMsg() : void
+    public function testCriticalMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);
@@ -223,11 +220,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the alert() method
+     * Test the alert() method.
      *
      * @return void
      */
-    public function testAlertMsg() : void
+    public function testAlertMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);
@@ -246,11 +243,11 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test the emergency() method
+     * Test the emergency() method.
      *
      * @return void
      */
-    public function testEmergencyMsg() : void
+    public function testEmergencyMsg()
     {
         $app = App::getInstance();
         $app->setDebugMode(true);

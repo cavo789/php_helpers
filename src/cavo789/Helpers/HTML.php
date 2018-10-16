@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * HTML Helper
@@ -17,18 +17,19 @@ use cavo789\Helpers\Strings as Strings;
 class HTML
 {
     /**
-     * Create a link ("<a href="...">...</a>)
+     * Create a link ("<a href="...">...</a>).
      *
      * @example
      *
      * HTML::makeLink('www.google.be', 'Google', ['class' => 'link'], true);
      * Will return '<a href="www.google.be" class="link" rel="noopener noreferrer">Google</a>';
      *
-     * @param  string $url               The URL like f.i. www.google.be
-     * @param  string $text              The text like "Click here to ..."
-     * @param  array  $extra             Any extra parameter (rel, target, class, ...)
-     * @param  bool   $secure            When true, the link will be make safe
-     * @param  bool   $removeTargetBlank Remove target=_blank if found
+     * @param string $url               The URL like f.i. www.google.be
+     * @param string $text              The text like "Click here to ..."
+     * @param array  $extra             Any extra parameter (rel, target, class, ...)
+     * @param bool   $secure            When true, the link will be make safe
+     * @param bool   $removeTargetBlank Remove target=_blank if found
+     *
      * @return string
      */
     public static function makeLink(
@@ -91,19 +92,20 @@ class HTML
     }
 
     /**
-     * Return the current URL
+     * Return the current URL.
      *
-     * @param  boolean $removeScriptName Remove the script from the URL
-     *                                   return http://localhost/BOSA/ and not
-     *                                   http://localhost/BOSA/index.php when True
-     *                                   i.e. remove "index.php"
-     * @param  boolean $removePathInfo   Remove the path after the script name
-     *                                   return http://localhost/BOSA/ and not
-     *                                   http://localhost/BOSA/index.php/API/clear
-     *                                   when True i.e. remove "/API/clear"
-     *                                   Works also when URLs are rewritten like
-     *                                   http://localhost/BOSA/API/clear,
-     *                                   http://localhost/BOSA/ will be returned
+     * @param bool $removeScriptName Remove the script from the URL
+     *                               return http://localhost/BOSA/ and not
+     *                               http://localhost/BOSA/index.php when True
+     *                               i.e. remove "index.php"
+     * @param bool $removePathInfo   Remove the path after the script name
+     *                               return http://localhost/BOSA/ and not
+     *                               http://localhost/BOSA/index.php/API/clear
+     *                               when True i.e. remove "/API/clear"
+     *                               Works also when URLs are rewritten like
+     *                               http://localhost/BOSA/API/clear,
+     *                               http://localhost/BOSA/ will be returned
+     *
      * @return string
      */
     public static function getCurrentURL(
@@ -121,7 +123,7 @@ class HTML
         $port = '';
         // $_SERVER['SERVER_PORT'] is not present when started from a CLI script
         if (isset($_SERVER['SERVER_PORT'])) {
-            if (!in_array($_SERVER['SERVER_PORT'], [80, 443])) {
+            if (!in_array($_SERVER['SERVER_PORT'], [80, 443], true)) {
                 $port = ":$_SERVER[SERVER_PORT]";
             }
         }
@@ -134,9 +136,9 @@ class HTML
         }
 
         // Get the URL (what appears after the server_name)
-        $URI = '';
+        $Uri = '';
         if (isset($_SERVER['REQUEST_URI'])) {
-            $URI = $_SERVER['REQUEST_URI'];
+            $Uri = $_SERVER['REQUEST_URI'];
 
             // When using rewritten URLs we can have
             // http://localhost/LimeSurvey/BOSA/api/clear
@@ -144,11 +146,11 @@ class HTML
             // Removing PathInfo should remove "/api/clear" since this is, also,
             // a parameter
             if ($removePathInfo) {
-                $URI = dirname($_SERVER['SCRIPT_NAME']);
+                $Uri = dirname($_SERVER['SCRIPT_NAME']);
             }
         }
 
-        $pageURL = $scheme . '://' . $serverName . $port . $URI;
+        $pageURL = $scheme . '://' . $serverName . $port . $Uri;
 
         // Do we need to remove the name of the script. If true, don't
         // return http://localhost/site/index.php but
@@ -178,10 +180,11 @@ class HTML
 
     /**
      * Add a querystring parameter. When the parameter was already present,
-     * update his value
+     * update his value.
      *
-     * @param  array   $params
-     * @param  boolean $addCurrentURL
+     * @param array $params
+     * @param bool  $addCurrentURL
+     *
      * @return string
      */
     public static function addURLParameter(
@@ -204,12 +207,13 @@ class HTML
     }
 
     /**
-     * Get a value from the querystring (URL)
+     * Get a value from the querystring (URL).
      *
-     * @param  string  $name    The name of the variable (f.i. "action")
-     * @param  string  $default A default value (f.i. "showIndex")
-     * @param  string  $filter
-     * @param  integer $source
+     * @param string $name    The name of the variable (f.i. "action")
+     * @param string $default A default value (f.i. "showIndex")
+     * @param string $filter
+     * @param int    $source
+     *
      * @return string
      */
     public static function getParameter(
@@ -221,18 +225,18 @@ class HTML
         // List of filters @https://www.w3schools.com/php/php_ref_filter.asp
         switch ($filter) {
             case 'bool':
-                $filter_type = FILTER_VALIDATE_BOOLEAN;
+                $filterType = FILTER_VALIDATE_BOOLEAN;
                 break;
 
             case 'int':
-                $filter_type = FILTER_VALIDATE_INT;
+                $filterType = FILTER_VALIDATE_INT;
                 break;
 
             default:
-                $filter_type = FILTER_SANITIZE_STRING;
+                $filterType = FILTER_SANITIZE_STRING;
         }
 
-        $value = filter_input($source, $name, $filter_type);
+        $value = filter_input($source, $name, $filterType);
 
         $value = (empty($value) ? $default : $value);
 
@@ -244,11 +248,12 @@ class HTML
     }
 
     /**
-     * Get a posted variable's value
+     * Get a posted variable's value.
      *
-     * @param  string $name
-     * @param  string $default
-     * @param  string $filter
+     * @param string $name
+     * @param string $default
+     * @param string $filter
+     *
      * @return string
      */
     public static function getFormVariable(
@@ -262,11 +267,12 @@ class HTML
     }
 
     /**
-     * Force the download of a file
+     * Force the download of a file.
      *
      * @throws \InvalidArgumentException When $filename doesn't exists on disk
      *
-     * @param  string $filename Full name to the file f.i. c:\...\file.csv
+     * @param string $filename Full name to the file f.i. c:\...\file.csv
+     *
      * @return void
      */
     public static function download(string $filename)
@@ -300,14 +306,15 @@ class HTML
 
     /**
      * Check if the $style also contains the <link> tag, if not,
-     * add the tag
+     * add the tag.
      *
      * @example
      *
      * HTML::addCSSTag('style.css');
      * Will return '<link rel="stylesheet" href="style.css" media="screen"/>';
      *
-     * @param  string $style
+     * @param string $style
+     *
      * @return string
      */
     public static function addCSSTag(string $style) : string
@@ -322,14 +329,15 @@ class HTML
 
     /**
      * Check if the $script also contains the <script> tag, if not,
-     * add the tag
+     * add the tag.
      *
      * @example
      *
      * HTML::addJSTag('script.js');
      * Will return <script type="text/javascript" src="script.js"></script>
      *
-     * @param  string $script
+     * @param string $script
+     *
      * @return string
      */
     public static function addJSTag(string $script) : string
@@ -344,9 +352,9 @@ class HTML
     }
 
     /**
-     * Detect if the request was made with an Ajax call or not
+     * Detect if the request was made with an Ajax call or not.
      *
-     * @return boolean
+     * @return bool
      */
     public static function isAjaxRequest() : bool
     {
@@ -361,7 +369,7 @@ class HTML
     }
 
     /**
-     * Parse the HTML string and remove comments
+     * Parse the HTML string and remove comments.
      *
      * @example
      *
@@ -369,7 +377,8 @@ class HTML
      *  HTML::removeHTMLComments($value);
      * Will return '<h1>Test</h1>';
      *
-     * @param  string $html
+     * @param string $html
+     *
      * @return string The HTML string without comments
      */
     public static function removeHTMLComments(string $html) : string
@@ -382,9 +391,10 @@ class HTML
     }
 
     /**
-     * Convert as CSV string into a HTML table
+     * Convert as CSV string into a HTML table.
      *
      * @suppress PhanUnusedVariable
+     * @suppress PhanTypeInvalidDimOffset
      *
      * @example
      *
@@ -394,7 +404,7 @@ class HTML
      *
      * Will return
      *      '<table><thead><tr><th>col1</th><th>col2</th><th>col3</th></tr></thead>' .
-     *  '<tbody><tr><td>row1-1</td><td>row1-2</td><td>row1-3</td><td></td></tr>' .
+     *      '<tbody><tr><td>row1-1</td><td>row1-2</td><td>row1-3</td><td></td></tr>' .
      *      '<tr><td>row2-1</td><td>row2-2</td><td>row2-3</td></tr></tbody></table>';
      *
      * @param string $sCSV  A comma separated content    *
@@ -547,7 +557,8 @@ class HTML
      *
      * @see https://github.com/padosoft/support/blob/master/src/string.php#L714
      *
-     * @param  string $value HTML string
+     * @param string $value HTML string
+     *
      * @return string Same string but without unneeded spaces between tags
      */
     public static function compress(string $value) : string

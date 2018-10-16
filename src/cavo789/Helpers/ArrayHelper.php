@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture (most coming from Laravel framework)
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * Generic helper functions for working with Arrays
@@ -15,10 +15,11 @@ namespace cavo789\Helpers;
 class ArrayHelper
 {
     /**
-     * Simple function that will convert array with items into a string
+     * Simple function that will convert array with items into a string.
      *
-     * @param  array  $arr
-     * @param  string $function User function that will be called for each item
+     * @param array  $arr
+     * @param string $function User function that will be called for each item
+     *
      * @return string
      */
     public static function array2string(array $arr, string $function = '') : string
@@ -40,8 +41,9 @@ class ArrayHelper
      * Convert an associative array (for instance the result of a
      * SQL SELECT STATEMENT) into a CSV string.
      *
-     * @param  array  $arr       The array with the records
-     * @param  string $delimiter The delimiter to use (default is ";")
+     * @param array  $arr       The array with the records
+     * @param string $delimiter The delimiter to use (default is ";")
+     *
      * @return string The CSV string
      */
     public static function array2csv(array $arr, string $delimiter = ';') : string
@@ -81,11 +83,13 @@ class ArrayHelper
 
     /**
      * Determine if the given key exists in the provided array.
+     *
      * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
      *
-     * @param  array   $array
-     * @param  string  $key
-     * @return boolean
+     * @param array  $array
+     * @param string $key
+     *
+     * @return bool
      */
     private static function exists(array $array, string $key) : bool
     {
@@ -98,9 +102,11 @@ class ArrayHelper
 
     /**
      * Determine whether the given value is array accessible.
+     *
      * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
      *
-     * @param  mixed $value
+     * @param mixed $value
+     *
      * @return bool
      */
     private static function accessible($value) : bool
@@ -110,16 +116,18 @@ class ArrayHelper
 
     /**
      * Get an item from an array using "dot" notation.
+     *
      * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
      *
-     * See also array_set() for updating the value of a key in an associative array
+     * See also arraySet() for updating the value of a key in an associative array
      *
-     * @param  array  $array
-     * @param  string $key
-     * @param  mixed  $default
+     * @param array  $array
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
-    public static function array_get(array $array, string $key, $default = null)
+    public static function arrayGet(array $array, string $key, $default = null)
     {
         if (!static::accessible($array)) {
             return $default;
@@ -151,19 +159,22 @@ class ArrayHelper
      * Set an array item to a given value using "dot" notation.
      * If no key is given to the method, the entire array will be replaced.
      *
-     * See also array_get() for getting the value of a key in an associative array
+     * See also arrayGet() for getting the value of a key in an associative array
      *
      * @see https://github.com/padosoft/support/blob/master/src/array.php#L130
      *
-     * @param  array  $array The array
-     * @param  string $key   The key to search, in "dot" notation
-     * @param  mixed  $value The new value
-     * @return void
+     * @param array  $array The array
+     * @param string $key   The key to search, in "dot" notation
+     * @param mixed  $value The new value
+     *
+     * @return array
      */
-    public static function array_set(array &$array, string $key, $value)
+    public static function arraySet(array &$array, string $key, $value) : array
     {
         if (is_null($key)) {
-            return $array = $value;
+            $array[] = $value;
+
+            return $array;
         }
 
         $keys = explode('.', $key);
@@ -187,7 +198,7 @@ class ArrayHelper
     }
 
     /**
-     * Transpose a two-dimensional array
+     * Transpose a two-dimensional array.
      *
      * ### Example
      *
@@ -242,7 +253,9 @@ class ArrayHelper
      *
      * @link https://stackoverflow.com/questions/797251/transposing-multidimensional-arrays-in-php/797268#797268
 
-     * @param  array $arr
+     *
+     * @param array $arr
+     *
      * @return array
      */
     public static function transpose(array $arr) : array

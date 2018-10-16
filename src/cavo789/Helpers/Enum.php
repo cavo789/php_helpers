@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Christophe Avonture (based on work of Benjamin Eberlei)
- * Written date : 2018-09-13
+ * Written date : 2018-09-13.
  *
  * Description
  * Enumeration helper
@@ -17,7 +17,7 @@ namespace cavo789\Helpers;
 abstract class Enum
 {
     /**
-     * Constructor
+     * Constructor.
      *
      * @suppress PhanUndeclaredProperty
      *
@@ -26,14 +26,14 @@ abstract class Enum
     final public function __construct($value)
     {
         $c = new \ReflectionClass($this);
-        if (!in_array($value, $c->getConstants())) {
+        if (!in_array($value, $c->getConstants(), true)) {
             throw new \InvalidArgumentException($value . ' isn\'t..');
         }
         $this->value = $value;
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @suppress PhanUndeclaredProperty
      *
