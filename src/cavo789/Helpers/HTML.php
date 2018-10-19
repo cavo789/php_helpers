@@ -554,8 +554,9 @@ class HTML
      *      <div class="row"><!-- CONTENT --><p>Main content</p></div></div></section>
      *
      * Every unneeded spaces between tags are removed
-     *
-     * @see https://github.com/padosoft/support/blob/master/src/string.php#L714
+     * 
+     * !!! Be careful with javascript code, the script will perhaps not !!! 
+     * !!! run anymore if this compression function is modified         !!!
      *
      * @param string $value HTML string
      *
@@ -563,10 +564,16 @@ class HTML
      */
     public static function compress(string $value) : string
     {
-        return preg_replace(
-            ['/\>[^\S ]+/s', '/[^\S ]+\</s', '/(\s)+/s'],
-            ['>', '<', '\\1'],
-            $value
+        $search = array(
+            '/\>[^\S ]+/s',	// strip white spaces after tags, except space
+            '/[^\S ]+\</s',	// strip white spaces before tags, except space
         );
+
+        $replace = array(
+            '>',
+            '<',
+        );
+
+        return preg_replace($search, $replace, $value);
     }
 }
