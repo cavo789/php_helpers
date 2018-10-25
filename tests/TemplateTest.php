@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace cavo789\tests;
 
@@ -15,10 +15,10 @@ final class TemplateTest extends TestCase
         $temp = new Template('html', __DIR__ . DIRECTORY_SEPARATOR . 'Templates');
 
         $arrVariables = [
-            'title' => 'Test Template',
+            'title'   => 'Test Template',
             'content' => 'Hello, this is my nice content',
-            'css' => '<link rel="stylesheet" href="style.css" media="screen"/>',
-            'js' => '<script src="js/jquery.js"></script>'
+            'css'     => '<link rel="stylesheet" href="style.css" media="screen"/>',
+            'js'      => '<script src="js/jquery.js"></script>',
         ];
 
         // When using "html" mode, we expect to have CSS and JS

@@ -375,7 +375,11 @@ class App implements LoggerInterface
             $context['trace'] = $arrTrace;
         }
 
-        $this->log->log($level, $message, $context);
+        // Something is wrong with the log
+		try {
+			$this->log->log($level, $message, $context);
+		} catch (\Exception $e) {
+		}
     }
 
     /**

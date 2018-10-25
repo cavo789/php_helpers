@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Christophe Avonture
@@ -40,15 +40,16 @@ class Template
     /**
      * Constructor.
      *
-     * @throws \InvalidArgumentException When the folder name if mentioned and doesn't exists on disk
      *
      * @param string $folder
+     *
+     * @throws \InvalidArgumentException When the folder name if mentioned and doesn't exists on disk
      */
     public function __construct(string $mode = 'html', string $folder = '')
     {
         self::setMode($mode);
 
-        if (trim($folder) !== '') {
+        if ('' !== trim($folder)) {
             $this->folder = rtrim(Files::sanitize($folder), DS);
 
             if (!Files::exists($this->folder)) {
@@ -66,9 +67,10 @@ class Template
     /**
      * Define the mode (f.i. "html" or "raw").
      *
-     * @throws \InvalidArgumentException When the mode isn't supported
      *
      * @param string $mode
+     *
+     * @throws \InvalidArgumentException When the mode isn't supported
      *
      * @return void
      */
@@ -81,15 +83,76 @@ class Template
     }
 
     /**
-     * Return the full name to a template.
+     * Return the HTML of the template.
      *
-     * @throws \InvalidArgumentException when $name is not found i.e. the file didn't exists
-     *
-     * @param string $name For instance "index"
+     * @param string  $template
+     * @param mixed[] $arrVariables
      *
      * @return string
      */
-    private function getTemplate(string $name) : string
+    public function show(
+        string $template = 'interface',
+        array $arrVariables = []
+    ): string {
+        // Retrieve the full name of the file
+        $file = self::getTemplate($template);
+
+        // Get the file's content on disk
+        $html = file_get_contents($file);
+
+        // Process all inclusion directives
+        $html = self::processInclusions($html);
+
+        // Remove conditional blocks based on the display mode (html, raw, ...)
+        $html = self::removeConditionalModeBlocks($html);
+
+        // Remove Ajax/Full blocks based on how the request was mode (Ajax or not)
+        $html = self::removeConditionalRequestBlocks($html);
+
+        // Remove any <!-- html comments -->
+        $html = HTML::removeHTMLComments($html);
+
+        // Remove unneeded spaces between html tags
+        $html = HTML::compress($html);
+
+        $url  = HTML::getCurrentURL(true);
+        $html = str_replace('{{ url }}', $url, $html);
+
+        $app  = App::getInstance();
+        $html = str_replace('{{ debug }}', strval($app->isDebugMode() ? 1 : 0), $html);
+
+        /**
+         * The HTML template can contains user tags like
+         *  {{ download_html }}
+         *  {{ download_pdf }}
+         *      {{ new_window_html }}
+         *      {{ my_own_tag }}.
+         *
+         * Get the list of key-value pair in the $arrVariables array and if one
+         * key is mentioned in the file replace the tag by its value
+         */
+        foreach ($arrVariables as $key => $value) {
+            if (false !== strpos($html, '{{ ' . $key . ' }}')) {
+                $html = str_replace('{{ ' . $key . ' }}', $value, $html);
+            }
+        }
+
+        $html = str_replace(PHP_EOL, "\n", $html);
+
+        return trim($html, " \n");
+    }
+
+    /**
+     * Return the full name to a template.
+     *
+     *
+     * @param string $name For instance "index"
+     *
+     * @throws \InvalidArgumentException when $name is not found i.e. the file didn't exists
+     *
+     * @return string
+     */
+    private function getTemplate(string $name): string
     {
         $name = Files::sanitize(trim($name));
 
@@ -116,7 +179,7 @@ class Template
      *
      * @return string
      */
-    private function processInclusions(string $html) : string
+    private function processInclusions(string $html): string
     {
         $pattern = "\{\{ include\(\'([^']*)\'\) \}\}";
 
@@ -127,7 +190,7 @@ class Template
             if ($matches[0] !== []) {
                 list($tags, $files) = $matches;
                 for ($i = 0; $i < count($files); $i++) {
-                    $tmp = self::getTemplate($files[$i]);
+                    $tmp  = self::getTemplate($files[$i]);
                     $html = str_replace($tags[$i], file_get_contents($tmp), $html);
                 }
             }
@@ -143,8 +206,8 @@ class Template
      *
      *      <!-- @if_html_start-->
      *          <link rel="stylesheet" href="assets/css/interface.css">
-     *          <link rel="stylesheet" href="assets/css/AdminLTE.min.css">
-     *          <link rel="stylesheet" href="assets/css/skins/skin-black.min.css">
+     *          <link rel="stylesheet" href="assets/libs/css/AdminLTE.min.css">
+     *          <link rel="stylesheet" href="assets/libs/css/skins/skin-black.min.css">
      *          <!-- @if_html_end-->
      *
      *      <!-- @if_raw_start-->
@@ -164,7 +227,7 @@ class Template
      *
      * @return string The same HTML but without these conditional blocks
      */
-    private function removeConditionalModeBlocks(string $html) : string
+    private function removeConditionalModeBlocks(string $html): string
     {
         // Get supported mode regex list (so get "html|raw") f.i.
         $supported = implode('|', $this->arrSupportedMode);
@@ -193,7 +256,7 @@ class Template
             // $arrFound table "HTML" and "RAW", so we need here to remove
             // the html entry (since we want to keep conditional HTML blocks)
             // and only want to remove "RAW" blocks
-            if (array_search($this->mode, $arrFound, true) !== false) {
+            if (false !== array_search($this->mode, $arrFound, true)) {
                 // Ok, we're ready for removing any blocks not related
                 // to the current mode (so, if $this->mode is "html", then
                 // we can remove all others blocks for mode "raw" f.i.
@@ -225,8 +288,8 @@ class Template
      *
      *      <!-- @if_full_start-->
      *          <link rel="stylesheet" href="assets/css/interface.css">
-     *          <link rel="stylesheet" href="assets/css/AdminLTE.min.css">
-     *          <link rel="stylesheet" href="assets/css/skins/skin-black.min.css">
+     *          <link rel="stylesheet" href="assets/libs/css/AdminLTE.min.css">
+     *          <link rel="stylesheet" href="assets/libs/css/skins/skin-black.min.css">
      *          <!-- @if_full_end-->
      *
      *      <!-- @if_ajax_start-->
@@ -242,8 +305,8 @@ class Template
      *
      *  <!-- @if_full_start-->
      *      <link rel="stylesheet" href="assets/css/interface.css">
-     *      <link rel="stylesheet" href="assets/css/AdminLTE.min.css">
-     *      <link rel="stylesheet" href="assets/css/skins/skin-black.min.css">
+     *      <link rel="stylesheet" href="assets/libs/css/AdminLTE.min.css">
+     *      <link rel="stylesheet" href="assets/libs/css/skins/skin-black.min.css">
      *      <!-- @if_full_end-->
      *
      * to indicate that these lines should be removed when called by Ajax
@@ -252,7 +315,7 @@ class Template
      *
      * @return string The same HTML but without these conditional blocks
      */
-    private function removeConditionalRequestBlocks(string $html) : string
+    private function removeConditionalRequestBlocks(string $html): string
     {
         // Detect if the call has been made with an Ajax request or not
         $isAjax = HTML::isAjaxRequest();
@@ -269,65 +332,5 @@ class Template
         $html = preg_replace('~' . $pattern . '~is', '', $html);
 
         return $html;
-    }
-
-    /**
-     * Return the HTML of the template.
-     *
-     * @param string  $template
-     * @param mixed[] $arrVariables
-     *
-     * @return string
-     */
-    public function show(
-        string $template = 'interface',
-        array $arrVariables = []
-    ) : string {
-        // Retrieve the full name of the file
-        $file = self::getTemplate($template);
-
-        // Get the file's content on disk
-        $html = file_get_contents($file);
-
-        // Process all inclusion directives
-        $html = self::processInclusions($html);
-
-        // Remove conditional blocks based on the display mode (html, raw, ...)
-        $html = self::removeConditionalModeBlocks($html);
-
-        // Remove Ajax/Full blocks based on how the request was mode (Ajax or not)
-        $html = self::removeConditionalRequestBlocks($html);
-
-        // Remove any <!-- html comments -->
-        $html = HTML::removeHTMLComments($html);
-
-        // Remove unneeded spaces between html tags
-        $html = HTML::compress($html);
-
-        $url = HTML::getCurrentURL(true);
-        $html = str_replace('{{ url }}', $url, $html);
-
-        $app = App::getInstance();
-        $html = str_replace('{{ debug }}', strval($app->isDebugMode() ? 1 : 0), $html);
-
-        /**
-         * The HTML template can contains user tags like
-         *  {{ download_html }}
-         *  {{ download_pdf }}
-         *      {{ new_window_html }}
-         *      {{ my_own_tag }}.
-         *
-         * Get the list of key-value pair in the $arrVariables array and if one
-         * key is mentioned in the file replace the tag by its value
-         */
-        foreach ($arrVariables as $key => $value) {
-            if (strpos($html, '{{ ' . $key . ' }}') !== false) {
-                $html = str_replace('{{ ' . $key . ' }}', $value, $html);
-            }
-        }
-
-        $html = str_replace(PHP_EOL, "\n", $html);
-
-        return trim($html, " \n");
     }
 }

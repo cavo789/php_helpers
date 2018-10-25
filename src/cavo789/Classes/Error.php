@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Christophe Avonture
- * Written date : 2018-09-13
-
+ * Written date : 2018-09-13.
+ *
  * Description
  * Just include this class at the very top of your script and every runtime
  * errors will be captured and displayed through this file.
@@ -39,7 +39,7 @@ declare(strict_types=1);
  *
  * Inspiration from
  *
- * @link https://www.codepunker.com/blog/handling-php-errors-with-class
+ * @see https://www.codepunker.com/blog/handling-php-errors-with-class
  */
 
 namespace cavo789\Classes;
@@ -174,15 +174,15 @@ class Error
         // When using a template, the position where the error message should be
         // inserted is, by default, defined by the "{{ error_message }}" tag. That tag
         // can be changed using the $tag parameter.
-        if (trim($tagMessage) !== '') {
+        if ('' !== trim($tagMessage)) {
             $this->tagMessage = $tagMessage;
         }
         // Same for the code
-        if (trim($tagCode) !== '') {
+        if ('' !== trim($tagCode)) {
             $this->tagCode = $tagCode;
         }
         // Same for the title
-        if (trim($tagTitle) !== '') {
+        if ('' !== trim($tagTitle)) {
             $this->tagTitle = $tagTitle;
         }
 
@@ -195,54 +195,6 @@ class Error
 
         // And remove it when the script is being finished
         register_shutdown_function([$this, 'shutdown']);
-    }
-
-    /**
-     * Load an instance of the class.
-     *
-     * @param string $template   HTML string or full name of the file to use as template
-     *                           for displaying errors
-     * @param string $timezone   Timezone like Europe/Paris
-     * @param string $dateFormat How to display date/time (f.i. D M Y H:i:s)
-     * @param string $tagMessage When using a template, text to search for replacing it
-     *                           by the error message (default is {{ error_message }})
-     * @param string $tagCode    When using a template, the error code will be inserted
-     *                           when the mentioned tag is found (default is {{ error_code }})
-     * @param string $tagTitle   When using a template, the error code will be inserted
-     *
-     * @return Error
-     */
-    public static function getInstance(
-        string $template = '',
-        string $timezone = 'Europe/Brussels',
-        string $dateFormat = 'd M Y H:i:s',
-        string $tagMessage = '{{ error_message }}',
-        string $tagCode = '{{ error_code }}',
-        string $tagTitle = '{{ error_title }}'
-    ) : Error {
-        if (null == self::$instance) {
-            self::$instance = new Error(
-                $template,
-                $timezone,
-                $dateFormat,
-                $tagMessage,
-                $tagCode,
-                $tagTitle
-            );
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * Check if the http request is an AJAX call.
-     *
-     * @return bool
-     */
-    private function isAjax() : bool
-    {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-            (strtolower(getenv('HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest');
     }
 
     /**
@@ -265,13 +217,13 @@ class Error
      *
      * @return string The outer HTML of the element
      */
-    public function getDOMHTML(\DOMNode $element, bool $outer = true) : string
+    public function getDOMHTML(\DOMNode $element, bool $outer = true): string
     {
         $dom = new \DOMDocument('1.0');
 
         $dom->preserveWhiteSpace = false;
-        $dom->encoding = 'utf-8';
-        $b = $dom->importNode($element->cloneNode(true), true);
+        $dom->encoding           = 'utf-8';
+        $b                       = $dom->importNode($element->cloneNode(true), true);
         $dom->appendChild($b);
         $html = $dom->saveHTML();
 
@@ -292,69 +244,89 @@ class Error
      *
      * @suppress PhanUnusedVariableCaughtException
      *
-     * @param int    $errno
-     * @param string $errstr
-     * @param string $errfile
-     * @param int    $errline
+     * @param int    $errNumber
+     * @param string $errMessage
+     * @param string $errFile
+     * @param int    $errLineNumber
      *
      * @return void
      */
-    public function scriptError(int $errno, string $errstr, string $errfile, int $errline)
-    {
+    public function scriptError(
+        int $errNumber,
+        string $errMessage,
+        string $errFile,
+        int $errLineNumber
+    ) {
         if (!headers_sent()) {
             header('HTTP/1.1 ' . $this->httpReturnedErrorCode . ' ' .
                 $this->httpReturnedErrorTitle);
         }
 
-        if (ob_get_contents() !== false) {
+        if (false !== ob_get_contents()) {
             ob_end_clean();
         }
 
-        switch ($errno) {
+        // Initialization
+        $errSeverity = 'Undefined error';
+
+        switch ($errNumber) {
             case E_ERROR:
-                $errseverity = 'Error';
+                $errSeverity = 'Error';
+
                 break;
             case E_WARNING:
-                $errseverity = 'Warning';
+                $errSeverity = 'Warning';
+
                 break;
             case E_NOTICE:
-                $errseverity = 'Notice';
+                $errSeverity = 'Notice';
+
                 break;
             case E_CORE_ERROR:
-                $errseverity = 'Core Error';
+                $errSeverity = 'Core Error';
+
                 break;
             case E_CORE_WARNING:
-                $errseverity = 'Core Warning';
+                $errSeverity = 'Core Warning';
+
                 break;
             case E_COMPILE_ERROR:
-                $errseverity = 'Compile Error';
+                $errSeverity = 'Compile Error';
+
                 break;
             case E_COMPILE_WARNING:
-                $errseverity = 'Compile Warning';
+                $errSeverity = 'Compile Warning';
+
                 break;
             case E_USER_ERROR:
-                $errseverity = 'User Error';
+                $errSeverity = 'User Error';
+
                 break;
             case E_USER_WARNING:
-                $errseverity = 'User Warning';
+                $errSeverity = 'User Warning';
+
                 break;
             case E_USER_NOTICE:
-                $errseverity = 'User Notice';
+                $errSeverity = 'User Notice';
+
                 break;
             case E_STRICT:
-                $errseverity = 'Strict Standards';
+                $errSeverity = 'Strict Standards';
+
                 break;
             case E_RECOVERABLE_ERROR:
-                $errseverity = 'Recoverable Error';
+                $errSeverity = 'Recoverable Error';
+
                 break;
             case E_DEPRECATED:
-                $errseverity = 'Deprecated';
+                $errSeverity = 'Deprecated';
+
                 break;
             case E_USER_DEPRECATED:
-                $errseverity = 'User Deprecated';
+                $errSeverity = 'User Deprecated';
+
                 break;
             default:
-                $errseverity = 'Error';
                 break;
         }
 
@@ -364,15 +336,15 @@ class Error
 
         // Build the error string
         $error = $Date . '<br/>' .
-            '<span style="color:red;font-weight:bold;">' . $errseverity . ':</span>&nbsp;' .
-            $errstr . '<br/>' .
-            '<span style="color:#3D9700;">Line ' . $errline . ': ' . $errfile . '</span>' .
+            '<span style="color:red;font-weight:bold;">' . $errSeverity . ':</span>&nbsp;' .
+            $errMessage . '<br/>' .
+            '<span style="color:#3D9700;">Line ' . $errLineNumber . ': ' . $errFile . '</span>' .
             '<br/><br/>';
 
         // Default template when none has been specified in the constructor
         $html = sprintf($this->defaultTemplate, $this->tagMessage);
 
-        if ($this->template !== '') {
+        if ('' !== $this->template) {
             // A template has been specified; is it a file or a string?
             if (file_exists($this->template)) {
                 try {
@@ -385,7 +357,7 @@ class Error
             }
         }
 
-        if (strpos($html, $this->tagMessage) !== false) {
+        if (false !== strpos($html, $this->tagMessage)) {
             $html = str_replace($this->tagMessage, trim($error), $html);
         } else {
             $html .= trim($error);
@@ -408,7 +380,7 @@ class Error
             $dom->loadHTML($html);
             // Search for a class called "main"
             $className = 'main';
-            $xpath = new \DOMXPath($dom);
+            $xpath     = new \DOMXPath($dom);
 
             $nodeList = $xpath->query("//div[contains(@class, '" . $className . "')]");
 
@@ -439,8 +411,57 @@ class Error
                 case E_CORE_WARNING:
                 case E_COMPILE_WARNING:
                     $this->scriptError($error['type'], $error['message'], $error['file'], $error['line']);
+
                     break;
             }
         }
+    }
+
+    /**
+     * Check if the http request is an AJAX call.
+     *
+     * @return bool
+     */
+    private function isAjax(): bool
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            ('xmlhttprequest' === strtolower(getenv('HTTP_X_REQUESTED_WITH')));
+    }
+
+    /**
+     * Load an instance of the class.
+     *
+     * @param string $template   HTML string or full name of the file to use as template
+     *                           for displaying errors
+     * @param string $timezone   Timezone like Europe/Paris
+     * @param string $dateFormat How to display date/time (f.i. D M Y H:i:s)
+     * @param string $tagMessage When using a template, text to search for replacing it
+     *                           by the error message (default is {{ error_message }})
+     * @param string $tagCode    When using a template, the error code will be inserted
+     *                           when the mentioned tag is found (default is {{ error_code }})
+     * @param string $tagTitle   When using a template, the error code will be inserted
+     *
+     * @return Error
+     */
+    public static function getInstance(
+        string $template = '',
+        string $timezone = 'Europe/Brussels',
+        string $dateFormat = 'd M Y H:i:s',
+        string $tagMessage = '{{ error_message }}',
+        string $tagCode = '{{ error_code }}',
+        string $tagTitle = '{{ error_title }}'
+    ): Error {
+        if (null == self::$instance) {
+            self::$instance = new Error(
+                $template,
+                $timezone,
+                $dateFormat,
+                $tagMessage,
+                $tagCode,
+                $tagTitle
+            );
+        }
+
+        return self::$instance;
     }
 }
