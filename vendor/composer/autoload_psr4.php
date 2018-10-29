@@ -6,20 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/type-resolver/src', $vendorDir . '/phpdocumentor/reflection-docblock/src'),
     'cavo789\\' => array($baseDir . '/src/cavo789'),
-    'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
-    'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
-    'Symfony\\Contracts\\' => array($vendorDir . '/symfony/contracts'),
-    'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
-    'Sabre\\Event\\' => array($vendorDir . '/sabre/event/lib'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
-    'Phan\\' => array($vendorDir . '/phan/phan/src/Phan'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
-    'Microsoft\\PhpParser\\' => array($vendorDir . '/microsoft/tolerant-php-parser/src'),
-    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
-    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
-    'Composer\\XdebugHandler\\' => array($vendorDir . '/composer/xdebug-handler/src'),
-    'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
-    'AdvancedJsonRpc\\' => array($vendorDir . '/felixfbecker/advanced-json-rpc/lib'),
 );

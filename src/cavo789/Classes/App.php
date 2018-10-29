@@ -149,12 +149,12 @@ class App implements LoggerInterface
      * @param bool    $debugMode False will hide errors in the browser
      *                           True will activate a verbose mode
      * @param mixed[] $extra
-     *                           'root'       = Root folder of the application (default: __DIR__)
-     *                           'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
-     *                           'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
-     *                           'timezone'   = Timezone to get the correct date/time info (default: 'Europe/Brussels')
-     *                           'dateFormat' = Date format (default: DEBUG_DATE)
-     *                           'traceDeep' = How many callers should be taken in each log entry?
+     *       'root'       = Root folder of the application (default: __DIR__)
+     *       'folder'     = Absolute folder name where to create the logfile (default: the temporary folder)
+     *       'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
+     *       'timezone'   = Timezone to get the correct date/time info (default: 'Europe/Brussels')
+     *       'dateFormat' = Date format (default: DEBUG_DATE)
+     *       'traceDeep' = How many callers should be taken in each log entry?
      *
      * @return void
      */
@@ -162,10 +162,13 @@ class App implements LoggerInterface
         bool $debugMode = false,
         array $extra = []
     ) {
-        $this->folder = rtrim(($extra['folder'] ?? __DIR__), DS) . DS;
+        // When no folder is mentioned, don't put the log files in the 
+        // current folder (i.e. not in __DIR__) but in the OS temporary 
+        // folder (i.e. `C:\WINDOWS\TEMP\` on a Windows platform)
+        $this->folder = rtrim(($extra['folder'] ?? sys_get_temp_dir()), DS) . DS;
 
         // Get the application root folder and be sure it's ending by
-        // a /
+        // a "/"
         $this->root = $extra['root'] ?? __DIR__;
         $this->root = rtrim(str_replace('/', DS, $this->root), DS) . DS;
 
