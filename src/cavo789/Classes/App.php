@@ -156,6 +156,8 @@ class App implements LoggerInterface
      *       'dateFormat' = Date format (default: DEBUG_DATE)
      *       'traceDeep' = How many callers should be taken in each log entry?
      *
+     * @throws AppException When the log folder is not writable
+     * 
      * @return void
      */
     private function __construct(
@@ -181,6 +183,15 @@ class App implements LoggerInterface
         }
 
         // Informs PHP where to store errors
+        // If debug mode enabled, make sure the folder is writable and if not, throws an exception
+        $folder = dirname($this->folder . $this->appLogFileName);
+        if (!is_writable($folder)) {
+            if ($debugMode) {
+                throw new AppException(sprintf('The folder %s isn\'t writable. ' .
+                    'Please change chmod to 755 or/and the owner of the folder to make it ' .
+                    'writable', $folder));
+            }
+        }
         ini_set('error_log', $this->folder . $this->errorLogFileName);
 
         // create a log channel (by using monolog)
@@ -203,6 +214,17 @@ class App implements LoggerInterface
                 }
             }
         }
+
+        // If debug mode enabled, make sure the folder is writable and if not, throws an exception
+        $folder = dirname($this->folder . $this->appLogFileName);
+        if (!is_writable($folder)) {
+            if ($debugMode) {
+                throw new AppException(sprintf('The folder %s isn\'t writable. ' .
+                    'Please change chmod to 755 or/and the owner of the folder to make it ' .
+                    'writable', $folder));
+            }
+        }
+
         $this->logHandler = new StreamHandler($this->folder . $this->appLogFileName, $level);
 
         // How a line in the log should looks like
@@ -378,11 +400,17 @@ class App implements LoggerInterface
             $context['trace'] = $arrTrace;
         }
 
-        // Something is wrong with the log
-		try {
-			$this->log->log($level, $message, $context);
-		} catch (\Exception $e) {
-		}
+        // Something is wrong with the log; get the error in debug mode, not in normal one
+        if (self::isDebugMode()) {
+            $error = Error::getInstance();
+            $this->log->log($level, $message, $context);
+        } else {
+			// No debug mode, don't raise an error if the logfile isn't accessible
+            try {
+                $this->log->log($level, $message, $context);
+            } catch (\Exception $e) {
+            }
+        }
     }
 
     /**
