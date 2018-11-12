@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Christophe Avonture
@@ -19,15 +19,14 @@ class Strings
      *
      *  startsWith('Laravel', 'Lara') ==> true
      *
-     * @link https://stackoverflow.com/a/834355/1065340
-
+     * @see https://stackoverflow.com/a/834355/1065340
      *
      * @param string $string The string
      * @param string $prefix The prefix to search
      *
      * @return bool True when the string is ending with that prefix
      */
-    public static function startsWith(string $string, string $prefix) : bool
+    public static function startsWith(string $string, string $prefix): bool
     {
         $length = strlen($prefix);
 
@@ -39,8 +38,7 @@ class Strings
      *
      *  endsWith('Laravel', 'vel') ==> true
      *
-     * @link https://stackoverflow.com/a/834355/1065340
-
+     * @see https://stackoverflow.com/a/834355/1065340
      *
      * @param string $string The string
      * @param string $suffix The suffix to search
@@ -51,7 +49,7 @@ class Strings
     {
         $length = strlen($suffix);
 
-        if ($length == 0) {
+        if (0 == $length) {
             return true;
         }
 
@@ -65,7 +63,7 @@ class Strings
      *
      * @return string
      */
-    public static function cleansing(string $value) : string
+    public static function cleansing(string $value): string
     {
         // Remove space, double and single quotes at the start/end
         $value = trim(trim($value, '" '), "'");
@@ -79,5 +77,34 @@ class Strings
         $value = preg_replace('~\s\s+~', ' ', $value);
 
         return $value;
+    }
+
+    /**
+     * Detect if the input string is a base64 encoded string.
+     *
+     * @param string $input
+     *
+     * @return bool
+     */
+    public static function isBase64(string $input): bool
+    {
+        $input = trim($input);
+
+        if ('' == $input) {
+            return false;
+        }
+
+        // Base64 regex pattern
+        $pattern = '~^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)' .
+            '|([0-9a-zA-Z+/]{3}=))?$~';
+
+        $is64 = false;
+
+        try {
+            $is64 = ((1 == preg_match($pattern, $input, $match)) ? true : false);
+        } catch (\Exception $e) {
+        }
+
+        return $is64;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace cavo789\tests;
 
@@ -27,5 +27,15 @@ final class StringsTest extends TestCase
         // Double quotes are removed
         $value = '"test_/?"';
         $this->assertTrue('test_/?' == Strings::cleansing($value));
+    }
+
+    public function testisBase64()
+    {
+        // Is a base 64 encoded string
+        $this->assertTrue(Strings::isBase64('SSdtIGEgc3RyaW5n'));
+
+        // These are not base64 encoded string; just ASCII values
+        $this->assertFalse(Strings::isBase64(''));
+        $this->assertFalse(Strings::isBase64("I'm a string"));
     }
 }
