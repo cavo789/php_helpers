@@ -1,3 +1,5 @@
+![Banner](images/banner.jpg)
+
 # php_helpers
 
 > Some helpers to develop faster in PHP 7
@@ -8,7 +10,7 @@
 - [Classes](#classes)
   _ [App](#app)
   _ [Error](#error)
-  \_ [Session](#session)
+  _ [Session](#session)
 - [Helpers](#helpers)
   _ [ArrayHelper](#arrayhelper)
   _ [Debug](#debug)
@@ -16,7 +18,7 @@
   _ [Files](#files)
   _ [HTML](#html)
   _ [Strings](#strings)
-  \_ [Template](#template)
+  _ [Template](#template)
 - [License](#license)
 
 ## Install
