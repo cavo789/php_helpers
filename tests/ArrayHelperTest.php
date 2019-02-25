@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace cavo789\tests;
 
-use \PHPUnit\Framework\TestCase;
 use \cavo789\Helpers\ArrayHelper as ArrayHelper;
+use \PHPUnit\Framework\TestCase;
 
 final class ArrayHelperTest extends TestCase
 {
@@ -16,7 +16,7 @@ final class ArrayHelperTest extends TestCase
      */
     public function testarray2string()
     {
-        $arr = ['style.css', 'interface.css', 'demo.css'];
+        $arr    = ['style.css', 'interface.css', 'demo.css'];
         $result = ArrayHelper::array2string($arr);
 
         // Just each item on a new line
@@ -24,7 +24,7 @@ final class ArrayHelperTest extends TestCase
 
         $this->assertTrue($expected == $result);
 
-        // addCSSTag will add the stylesheet tag if not already mentionned
+        // addCSSTag will add the stylesheet tag if not already mentioned
         //  <link rel="stylesheet" href="xxxx" media="screen"/>
         $result = ArrayHelper::array2string($arr, 'cavo789\Helpers\HTML::addCSSTag');
 
@@ -80,7 +80,7 @@ final class ArrayHelperTest extends TestCase
     {
         // Create an associative array
         $json = '{ "cdn" : { "enabled" : "1", "css" : [ "style.css", "interface.css", "demo.css" ] } }';
-        $arr = json_decode($json, true);
+        $arr  = json_decode($json, true);
 
         // Use dot notation to retrieve a key; get "cdn.enabled"
         // Retrieve a boolean
@@ -88,7 +88,7 @@ final class ArrayHelperTest extends TestCase
         $this->assertTrue($value);
 
         // Retrieve an array
-        $arr = ArrayHelper::arrayGet($arr, 'cdn.css');
+        $arr      = ArrayHelper::arrayGet($arr, 'cdn.css');
         $expected = ['style.css', 'interface.css', 'demo.css'];
         $this->assertTrue($arr == $expected);
     }
@@ -103,7 +103,7 @@ final class ArrayHelperTest extends TestCase
     {
         // Create an associative array
         $json = '{ "cdn" : { "enabled" : "1", "css" : [ "style.css", "interface.css", "demo.css" ] } }';
-        $arr = json_decode($json, true);
+        $arr  = json_decode($json, true);
 
         // Use dot notation to retrieve a key; get "cdn.enabled"
         // Retrieve a boolean
@@ -124,7 +124,7 @@ final class ArrayHelperTest extends TestCase
     public function testtranspose()
     {
         // Define a two dimensional array
-        $arr = [];
+        $arr                       = [];
         $arr['User1']['Question1'] = 'Answer User1 - Q1';
         $arr['User2']['Question1'] = 'Answer User2 - Q1';
         $arr['User3']['Question1'] = 'Answer User3 - Q1';
@@ -136,7 +136,7 @@ final class ArrayHelperTest extends TestCase
         $arr['User3']['Question3'] = 'Answer User3 - Q3';
 
         // Expected: the same table but transposed
-        $expected = [];
+        $expected                       = [];
         $expected['Question1']['User1'] = 'Answer User1 - Q1';
         $expected['Question1']['User2'] = 'Answer User2 - Q1';
         $expected['Question1']['User3'] = 'Answer User3 - Q1';

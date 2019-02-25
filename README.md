@@ -6,22 +6,45 @@
 
 ## Table of Contents
 
-- [Install](#install)
+- [Table of Contents](#table-of-contents)
+- [Build & test](#build--test)
+- [Install the library in your project](#install-the-library-in-your-project)
 - [Classes](#classes)
-  _ [App](#app)
-  _ [Error](#error)
-  _ [Session](#session)
+  - [App](#app)
+  - [Error](#error)
+  - [Session](#session)
 - [Helpers](#helpers)
-  _ [ArrayHelper](#arrayhelper)
-  _ [Debug](#debug)
-  _ [Enum](#enum)
-  _ [Files](#files)
-  _ [HTML](#html)
-  _ [Strings](#strings)
-  _ [Template](#template)
+  - [ArrayHelper](#arrayhelper)
+  - [Debug](#debug)
+    - [Method enable()](#method-enable)
+  - [Enum](#enum)
+  - [Files](#files)
+  - [HTML](#html)
+  - [Strings](#strings)
+  - [Template](#template)
 - [License](#license)
 
-## Install
+## Build & test
+
+Make sure dependencies are up-to-date
+
+```
+composer update
+```
+
+During development phase, to make sure the package is valid, run the following command. This will check that the composer.json file is correctly set up.
+
+```
+composer validate
+```
+
+To test the package locally, without publishing a new version of [Packagist](https://packagist.org/), just execute the following command on the prompt. This will create (or update) a `/vendor` folder and install a fresh version of the library.
+
+```
+composer install
+```
+
+## Install the library in your project
 
 Installation is done through composer, just run `composer require cavo789/php_helpers`.
 

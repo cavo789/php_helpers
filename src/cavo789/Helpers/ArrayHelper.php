@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Christophe Avonture (most coming from Laravel framework)
@@ -18,12 +18,34 @@ class ArrayHelper
      * Simple function that will convert array with items into a string.
      *
      * @param array  $arr
-     * @param string $function User function that will be called for each item
+     * @param string $function  User function that will be called for each item
+     * @param string $separator Separator to put between two items (f.i. PHP_EOL or ";" or "-" ...)
+     *
+     * ### Examples
+     *
+     * Convert an array into a string; each item delimited by a EOL char;
+     * the code below will display three lines; one item by line:
+     *
+     * ```php
+     * $arr = ['style.css', 'interface.css', 'demo.css']
+     * echo array2string($arr, '', PHP_EOL);
+     * ```
+     *
+     * Same but delimited by a ";"
+     * the code below will display one line; items like "style.css;interface.css;demo.css"
+     *
+     * ```php
+     * $arr = ['style.css', 'interface.css', 'demo.css']
+     * echo array2string($arr, '', ';');
+     * ```
      *
      * @return string
      */
-    public static function array2string(array $arr, string $function = '') : string
-    {
+    public static function array2string(
+        array $arr,
+        string $function = '',
+        string $separator = PHP_EOL
+    ): string {
         $return = '';
 
         foreach ($arr as $value) {
@@ -31,10 +53,47 @@ class ArrayHelper
                 $value = call_user_func($function, $value);
             }
 
-            $return .= $value . PHP_EOL;
+            $return .= $value . $separator;
         }
 
-        return rtrim($return, PHP_EOL);
+        return rtrim($return, $separator);
+    }
+
+    /**
+     * Convert an associative array into a string.
+     *
+     * @param array  $arr
+     * @param string $separator Separator to put between two items (f.i. PHP_EOL or ";" or "-" ...)
+     *
+     * ### Examples
+     *
+     * Convert an array into a string; output key and value.
+     * The following example will return "name='Avonture',firstname='Christophe'"
+     *
+     * ```php
+     * $arr = ["name"=>"Avonture","firstname"=>"Christophe"];
+     * echo array2string($arr, ',');
+     * ```
+     *
+     * @return string
+     */
+    public static function associativearray2string(
+        array $arr,
+        string $delimiter = ';'
+    ): string {
+        $return = '';
+
+        if (count($arr) > 0) {
+            $return = implode($delimiter, array_map(
+                function ($v, $k) {
+                    return sprintf("%s='%s'", $k, $v);
+                },
+                $arr,
+                array_keys($arr)
+            ));
+        }
+
+        return $return;
     }
 
     /**
@@ -46,12 +105,12 @@ class ArrayHelper
      *
      * @return string The CSV string
      */
-    public static function array2csv(array $arr, string $delimiter = ';') : string
+    public static function array2csv(array $arr, string $delimiter = ';'): string
     {
         $sCSV = '';
 
         // Empty ? Nothing to do
-        if (count($arr) == 0) {
+        if (0 == count($arr)) {
             return $sCSV;
         }
 
@@ -59,7 +118,7 @@ class ArrayHelper
         $delimiter = trim($delimiter);
 
         // Can't be empty
-        if ($delimiter == '') {
+        if ('' == $delimiter) {
             $delimiter = ';';
         }
 
@@ -79,39 +138,6 @@ class ArrayHelper
         }
 
         return trim($sCSV, PHP_EOL);
-    }
-
-    /**
-     * Determine if the given key exists in the provided array.
-     *
-     * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
-     *
-     * @param array  $array
-     * @param string $key
-     *
-     * @return bool
-     */
-    private static function exists(array $array, string $key) : bool
-    {
-        if ($array instanceof \ArrayAccess) {
-            return $array->offsetExists($key);
-        }
-
-        return array_key_exists($key, $array);
-    }
-
-    /**
-     * Determine whether the given value is array accessible.
-     *
-     * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
-     *
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    private static function accessible($value) : bool
-    {
-        return is_array($value) || $value instanceof \ArrayAccess;
     }
 
     /**
@@ -140,7 +166,7 @@ class ArrayHelper
             return $array[$key];
         }
 
-        if (strpos($key, '.') === false) {
+        if (false === strpos($key, '.')) {
             return $array[$key] ?? $default;
         }
 
@@ -169,7 +195,7 @@ class ArrayHelper
      *
      * @return array
      */
-    public static function arraySet(array &$array, string $key, $value) : array
+    public static function arraySet(array &$array, string $key, $value): array
     {
         if (is_null($key)) {
             $array[] = $value;
@@ -251,14 +277,13 @@ class ArrayHelper
      *  ]
      *
      *
-     * @link https://stackoverflow.com/questions/797251/transposing-multidimensional-arrays-in-php/797268#797268
-
+     * @see https://stackoverflow.com/questions/797251/transposing-multidimensional-arrays-in-php/797268#797268
      *
      * @param array $arr
      *
      * @return array
      */
-    public static function transpose(array $arr) : array
+    public static function transpose(array $arr): array
     {
         $out = [];
         foreach ($arr as $key => $subarr) {
@@ -268,5 +293,38 @@ class ArrayHelper
         }
 
         return $out;
+    }
+
+    /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
+     *
+     * @param array  $array
+     * @param string $key
+     *
+     * @return bool
+     */
+    private static function exists(array $array, string $key): bool
+    {
+        if ($array instanceof \ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+
+        return array_key_exists($key, $array);
+    }
+
+    /**
+     * Determine whether the given value is array accessible.
+     *
+     * @filesource Laravel - vendor/laravel/framework/src/Illuminate/Support/Arr.php
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    private static function accessible($value): bool
+    {
+        return is_array($value) || $value instanceof \ArrayAccess;
     }
 }

@@ -3,6 +3,6 @@
 /docs/*
 /tests/testFolder/*
 /tests/logs/*
-/vendor
+/vendor/*
 phan.bat
 .php_cs.cache

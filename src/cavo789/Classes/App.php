@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Christophe Avonture
@@ -30,12 +30,12 @@ namespace cavo789\Classes;
 
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
-use \cavo789\Helpers\Files as Files;
 use \cavo789\Exception\AppException as AppException;
-use \Psr\Log\LoggerInterface as LoggerInterface;
-use \Monolog\Logger as Logger;
-use \Monolog\Handler\StreamHandler as StreamHandler;
+use \cavo789\Helpers\Files as Files;
 use \Monolog\Formatter\LineFormatter as LineFormatter;
+use \Monolog\Handler\StreamHandler as StreamHandler;
+use \Monolog\Logger as Logger;
+use \Psr\Log\LoggerInterface as LoggerInterface;
 
 // Each line outputted in the log file will respect this template
 // @link https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
@@ -119,7 +119,7 @@ class App implements LoggerInterface
     private $logHandler = null;
 
     /**
-     * Deep of the trace (how many parent's informations should be dumped).
+     * Deep of the trace (how many parent's information's should be dumped).
      *
      * @var int
      * @access private
@@ -149,23 +149,23 @@ class App implements LoggerInterface
      * @param bool    $debugMode False will hide errors in the browser
      *                           True will activate a verbose mode
      * @param mixed[] $extra
-     *       'root'       = Root folder of the application (default: __DIR__)
-     *       'folder'     = Absolute folder name where to create the logfile (default: the temporary folder)
-     *       'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
-     *       'timezone'   = Timezone to get the correct date/time info (default: 'Europe/Brussels')
-     *       'dateFormat' = Date format (default: DEBUG_DATE)
-     *       'traceDeep' = How many callers should be taken in each log entry?
+     *                           'root'       = Root folder of the application (default: __DIR__)
+     *                           'folder'     = Absolute folder name where to create the logfile (default: the temporary folder)
+     *                           'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
+     *                           'timezone'   = Timezone to get the correct date/time info (default: 'Europe/Brussels')
+     *                           'dateFormat' = Date format (default: DEBUG_DATE)
+     *                           'traceDeep' = How many callers should be taken in each log entry?
      *
      * @throws AppException When the log folder is not writable
-     * 
+     *
      * @return void
      */
     private function __construct(
         bool $debugMode = false,
         array $extra = []
     ) {
-        // When no folder is mentioned, don't put the log files in the 
-        // current folder (i.e. not in __DIR__) but in the OS temporary 
+        // When no folder is mentioned, don't put the log files in the
+        // current folder (i.e. not in __DIR__) but in the OS temporary
         // folder (i.e. `C:\WINDOWS\TEMP\` on a Windows platform)
         $this->folder = rtrim(($extra['folder'] ?? sys_get_temp_dir()), DS) . DS;
 
@@ -245,38 +245,6 @@ class App implements LoggerInterface
     }
 
     /**
-     * This class should be loaded only once so if called
-     * in several PHP scripts, we need to avoid to load the
-     * class again and again. For this, use getInstance() to
-     * load a Singleton and return the $instance pointer as
-     * from the second class.
-     *
-     * @param bool    $debugMode False will hide errors in the browser
-     *                           True will activate a verbose mode
-     * @param mixed[] $extra
-     *                           'root'       = Root folder of the application (default: __DIR__)
-     *                           'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
-     *                           'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
-     *                           'timezone'   = Timezone to get the correct date/time
-     *                           info (default: 'Europe/Brussels')
-     *                           'dateFormat' = Date format (default: DEBUG_DATE)
-     *                           'traceDeep'  = How many callers should be taken in
-     *                           each log entry? (default: DEBUG_TRACE_DEEP)
-     *
-     * @return App
-     */
-    public static function getInstance(
-        bool $debugMode = false,
-        array $extra = []
-    ) : App {
-        if (null == self::$instance) {
-            self::$instance = new App($debugMode, $extra);
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * Set the debugging mode.
      *
      * @param bool $onOff
@@ -297,7 +265,7 @@ class App implements LoggerInterface
         $this->logHandler->setLevel($this->debugMode ? Logger::DEBUG : Logger::ERROR);
 
         // When debug mode is on, we want to see every messages; even notice.
-        if ($this->debugMode === true) {
+        if (true === $this->debugMode) {
             ini_set('display_errors', '1');
             ini_set('display_startup_errors', '1');
             ini_set('html_errors', '1');
@@ -320,33 +288,9 @@ class App implements LoggerInterface
      *
      * @return bool
      */
-    public function isDebugMode() : bool
+    public function isDebugMode(): bool
     {
         return $this->debugMode;
-    }
-
-    /**
-     * Output in the application log information's about the context
-     * of the current script.
-     *
-     * @return void
-     */
-    private function logContext()
-    {
-        // Record the used path_info; used when calling an API like
-        // "index.php/stats/surveys_count"
-        if (isset($_SERVER['PATH_INFO'])) {
-            if (trim($_SERVER['PATH_INFO']) !== '') {
-                self::info('PATH_INFO: ' . $_SERVER['PATH_INFO']);
-            }
-        }
-
-        // And get the query string if there is one
-        if (isset($_SERVER['QUERY_STRING'])) {
-            if (trim($_SERVER['QUERY_STRING']) !== '') {
-                self::info('QUERY_STRING: ' . $_SERVER['QUERY_STRING']);
-            }
-        }
     }
 
     /**
@@ -385,8 +329,8 @@ class App implements LoggerInterface
                     // These entries aren't needed; try to minimize the
                     // records otherwise the file will be too big to be
                     // analyzed
-                    unset($trace[$i]['object']);
-                    unset($trace[$i]['type']);
+                    unset($trace[$i]['object'], $trace[$i]['type']);
+
                     $arrTrace[$i] = $trace[$i];
                 }
             } catch (AppException $e) {
@@ -405,7 +349,7 @@ class App implements LoggerInterface
             $error = Error::getInstance();
             $this->log->log($level, $message, $context);
         } else {
-			// No debug mode, don't raise an error if the logfile isn't accessible
+            // No debug mode, don't raise an error if the logfile isn't accessible
             try {
                 $this->log->log($level, $message, $context);
             } catch (\Exception $e) {
@@ -531,5 +475,61 @@ class App implements LoggerInterface
     public function emergency($message, array $context = [])
     {
         self::log(LOGGER::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * Output in the application log information's about the context
+     * of the current script.
+     *
+     * @return void
+     */
+    private function logContext()
+    {
+        // Record the used path_info; used when calling an API like
+        // "index.php/stats/surveys_count"
+        if (isset($_SERVER['PATH_INFO'])) {
+            if ('' !== trim($_SERVER['PATH_INFO'])) {
+                self::info('PATH_INFO: ' . $_SERVER['PATH_INFO']);
+            }
+        }
+
+        // And get the query string if there is one
+        if (isset($_SERVER['QUERY_STRING'])) {
+            if ('' !== trim($_SERVER['QUERY_STRING'])) {
+                self::info('QUERY_STRING: ' . $_SERVER['QUERY_STRING']);
+            }
+        }
+    }
+
+    /**
+     * This class should be loaded only once so if called
+     * in several PHP scripts, we need to avoid to load the
+     * class again and again. For this, use getInstance() to
+     * load a Singleton and return the $instance pointer as
+     * from the second class.
+     *
+     * @param bool    $debugMode False will hide errors in the browser
+     *                           True will activate a verbose mode
+     * @param mixed[] $extra
+     *                           'root'       = Root folder of the application (default: __DIR__)
+     *                           'folder'     = Absolute folder name where to create the logfile (default: __DIR__)
+     *                           'prefix'     = Prefix to use for entries in the logfile (default: 'APP')
+     *                           'timezone'   = Timezone to get the correct date/time
+     *                           info (default: 'Europe/Brussels')
+     *                           'dateFormat' = Date format (default: DEBUG_DATE)
+     *                           'traceDeep'  = How many callers should be taken in
+     *                           each log entry? (default: DEBUG_TRACE_DEEP)
+     *
+     * @return App
+     */
+    public static function getInstance(
+        bool $debugMode = false,
+        array $extra = []
+    ): App {
+        if (null == self::$instance) {
+            self::$instance = new App($debugMode, $extra);
+        }
+
+        return self::$instance;
     }
 }
