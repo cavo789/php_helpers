@@ -1,6 +1,6 @@
-![Banner](images/banner.jpg)
-
 # php_helpers
+
+![Banner](./banner.svg)
 
 > Some helpers to develop faster in PHP 7
 
